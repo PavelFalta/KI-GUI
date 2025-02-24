@@ -21,3 +21,25 @@ dependencies = [
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "A",  # prevent using keywords that clobber python builtins
+    "B",  # bugbear: security warnings
+    "E",  # pycodestyle
+    "F",  # pyflakes
+    "ISC",  # implicit string concatenation
+    "UP",  # alert you when better syntax is available in your python version
+    "N",   # pep8-naming
+    "PTH",  # use pathlib
+]
+preview = true
+ignore = ["E501", "E712", "E711"]  # zbytecne to rve, co lze upravit formatter upravi
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
