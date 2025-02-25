@@ -9,3 +9,5 @@ services:
     restart: always
     volumes:
       - ../api:/code
+    env_file:
+      - ../api/.env
