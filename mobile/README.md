@@ -2,14 +2,14 @@
 
 ## How to run
 
-1. Install dependencies
+Using Docker:
+```bash
+docker compose up --build
+```
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-    npx expo start
-   ```
+Or run the project locally:
+```bash
+cd src
+npm install
+npx expo start
+```
