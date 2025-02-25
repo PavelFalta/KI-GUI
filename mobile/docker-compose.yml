@@ -1,0 +1,10 @@
+services:
+  mobile:
+    build: .
+    container_name: mobile
+    ports:
+      - 8081:8081 # Web preview
+      - 19001:19001 # Expo Go
+    volumes:
+      - ./src:/usr/src/mobile
+      - /usr/src/mobile/node_modules # Protect this folder from being overwritten by mount
