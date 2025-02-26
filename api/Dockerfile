@@ -14,12 +14,12 @@ RUN apt-get update && apt-get install -y \
     curl
 COPY ./README.md /code/
 COPY ./pyproject.toml /code/
-COPY ./src /code/src
+COPY ./app /code/app
 
 ENV TZ=Europe/Prague
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # CMD [ "fastapi", "dev", "/code/src/main.py" ]
-CMD [ "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000","--reload" ]
+CMD [ "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000","--reload" ]
 
 
