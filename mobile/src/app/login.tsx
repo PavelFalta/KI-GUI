@@ -1,10 +1,11 @@
 import { Text, View } from 'react-native';
 import { styles } from '@/constants/Theme';
+import { GenericButton } from '@/components/Button';
 
-export default function NotFoundScreen() {
+export default function LoginScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>The requested page was not found.</Text>
+      <GenericButton title="Log in" href="/courses" />
     </View>
   );
 }

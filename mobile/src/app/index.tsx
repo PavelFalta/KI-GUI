@@ -1,10 +1,11 @@
 import { Text, View } from 'react-native';
 import { styles } from '@/constants/Theme';
+import { GenericButton } from '@/components/Button';
 
-export default function NotFoundScreen() {
+export default function WelcomeScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>The requested page was not found.</Text>
+      <GenericButton title="Get started" href="/login" />
     </View>
   );
 }

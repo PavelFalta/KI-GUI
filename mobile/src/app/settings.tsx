@@ -1,10 +1,10 @@
 import { Text, View } from 'react-native';
 import { styles } from '@/constants/Theme';
 
-export default function NotFoundScreen() {
+export default function SettingsPage() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>The requested page was not found.</Text>
+      <Text style={styles.text}>This page is currently under contstruction.</Text>
     </View>
   );
 }

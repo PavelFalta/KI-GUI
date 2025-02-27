@@ -31,6 +31,8 @@ export const styles = StyleSheet.create({
   },
   text: {
     color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
   },
   button: {
     fontSize: 20,
