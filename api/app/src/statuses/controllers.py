@@ -19,7 +19,7 @@ def create_status(sql: Session, data: StatusCreate) -> StatusResponse:
         sql.add(new_status)
         sql.commit()
         sql.refresh(new_status)
-        print(new_status.__dict__)
+        
         return StatusResponse.model_validate(new_status)
 
     except IntegrityError as e:
