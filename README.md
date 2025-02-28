@@ -7,7 +7,7 @@
   
 ## BACKEND
 - py
-- FastAPI
+- FastAPI - poetry?
 - CRUD + ORM
 
 ## PRVNI FAZE
