@@ -16,7 +16,8 @@ dependencies = [
     "fastapi[standard] (>=0.115.8,<0.116.0)",
     "ruff (>=0.9.7,<0.10.0)",
     "pydantic-settings (>=2.8.0,<3.0.0)",
-    "sqlalchemy (>=2.0.38,<3.0.0)"
+    "sqlalchemy (>=2.0.38,<3.0.0)",
+    "sqlalchemy-schemadisplay (>=2.0,<3.0)",
 ]
 
 

@@ -12,6 +12,7 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 RUN apt-get update && apt-get install -y \
     nano \
     curl
+RUN apt-get update && apt-get install -y graphviz
 COPY ./README.md /code/
 COPY ./pyproject.toml /code/
 COPY ./app /code/app
