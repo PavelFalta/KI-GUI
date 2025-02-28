@@ -89,3 +89,29 @@
 - `task` – relace k **Task** (`back_populates="students"`)  
 - `assigner` – relace k **User** (`back_populates="assigned_by_tasks"`)  
 - `status` – relace k **Status** (`back_populates="student_tasks"`)  
+
+# API Endpoints
+
+| Endpoint                                  | Method(s)                |
+|-------------------------------------------|--------------------------|
+| /auth/register                            | POST                     |
+| /auth/login                               | POST                     |
+| /auth/logout                              | POST                     |
+| /users                                    | GET, POST                |
+| /users/{user_id}                          | GET, PUT/PATCH, DELETE   |
+| /users/{user_id}/tasks                    | GET, POST                |
+| /roles                                    | GET, POST                |
+| /roles/{role_id}                          | GET, PUT/PATCH, DELETE   |
+| /statuses                                 | GET, POST                |
+| /statuses/{id}                            | GET, PUT/PATCH, DELETE   |
+| /categories                               | GET, POST                |
+| /categories/{id}                          | GET, PUT/PATCH, DELETE   |
+| /tasks                                    | GET, POST                |
+| /tasks/{task_id}                          | GET, PUT/PATCH, DELETE   |
+| /student-tasks                            | GET, POST                |
+| /student-tasks/{student_task_id}          | GET, PUT/PATCH, DELETE   |
+| /bulk-assign                              | POST                     |
+| /bulk-approve                             | POST                     |
+| /student-tasks/{id}/certificate           | POST                     |
+
+ - Certificate optional
