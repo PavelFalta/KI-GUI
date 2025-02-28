@@ -10,7 +10,6 @@ class Status(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50), unique=True, nullable=False)
     description = Column(String(100), nullable=True)
-    is_active = Column(Boolean, nullable=False, default=True)
 
     tasks = relationship("Task", back_populates="status")
 

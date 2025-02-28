@@ -16,6 +16,6 @@ class StatusResponse(StatusBase):
     model_config = ConfigDict(from_attributes=True)
 
 
-class StatusUpdate(StatusBase):
+class StatusUpdate(BaseModel):
     name: str | None = None
     description: str | None = None
