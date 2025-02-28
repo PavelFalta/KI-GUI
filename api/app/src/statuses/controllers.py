@@ -23,15 +23,6 @@ def get_statuses(sql: Session) -> list[StatusResponse]:
             for status in sql.query(models.Status).all()
         ]
 
-    except ResponseValidationError as e:
-        raise HTTPException(status_code=400, detail="Invalid request") from e
-
-    except OperationalError as e:
-        raise HTTPException(status_code=503, detail="Internal server error") from e
-
-    except SQLAlchemyError as e:
-        raise HTTPException(status_code=500, detail="Internal server error") from e
-
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error") from e
 
@@ -57,17 +48,6 @@ def create_status(sql: Session, data: StatusCreate) -> StatusResponse:
     except IntegrityError as e:
         sql.rollback()
         raise HTTPException(status_code=409, detail="Status already exists") from e
-
-    except OperationalError as e:
-        sql.rollback()
-        raise HTTPException(status_code=503, detail="Internal server error") from e
-
-    except ResponseValidationError as e:
-        sql.rollback()
-        raise HTTPException(status_code=400, detail="Invalid request") from e
-
-    except SQLAlchemyError as e:
-        raise HTTPException(status_code=500, detail="Internal server error") from e
 
     except Exception as e:
         sql.rollback()
@@ -103,18 +83,6 @@ def update_status(sql: Session, data: StatusUpdate, status_id: int) -> StatusRes
         sql.rollback()
         raise HTTPException(status_code=409, detail="Status already exists") from e
 
-    except OperationalError as e:
-        sql.rollback()
-        raise HTTPException(status_code=503, detail="Internal server error") from e
-
-    except ResponseValidationError as e:
-        sql.rollback()
-        raise HTTPException(status_code=422, detail="Invalid request") from e
-
-    except SQLAlchemyError as e:
-        sql.rollback()
-        raise HTTPException(status_code=500, detail="Internal server error") from e
-
     except Exception as e:
         sql.rollback()
         raise HTTPException(status_code=500, detail="Internal server error") from e
@@ -141,16 +109,7 @@ def get_status(sql: Session, status_id: int) -> StatusResponse:
 
     except HTTPException as e:
         raise e
-
-    except ResponseValidationError as e:
-        raise HTTPException(status_code=422, detail="Invalid request") from e
-
-    except OperationalError as e:
-        raise HTTPException(status_code=503, detail="Internal server error") from e
-
-    except SQLAlchemyError as e:
-        raise HTTPException(status_code=500, detail="Internal server error") from e
-
+    
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error") from e
     
@@ -168,15 +127,6 @@ def delete_status(sql: Session, status_id: int):
 
     except HTTPException as e:
         raise e
-
-    except ResponseValidationError as e:
-        raise HTTPException(status_code=422, detail="Invalid request") from e
-
-    except OperationalError as e:
-        raise HTTPException(status_code=503, detail="Internal server error") from e
-
-    except SQLAlchemyError as e:
-        raise HTTPException(status_code=500, detail="Internal server error") from e
 
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error") from e

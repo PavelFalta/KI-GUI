@@ -23,15 +23,6 @@ def get_roles(sql: Session) -> list[RoleResponse]:
             for role in sql.query(models.Role).all()
         ]
 
-    except ResponseValidationError as e:
-        raise HTTPException(status_code=400, detail="Invalid request") from e
-
-    except OperationalError as e:
-        raise HTTPException(status_code=503, detail="Internal server error") from e
-
-    except SQLAlchemyError as e:
-        raise HTTPException(status_code=500, detail="Internal server error") from e
-
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error") from e
 
@@ -57,17 +48,6 @@ def create_role(sql: Session, data: RoleCreate) -> RoleResponse:
     except IntegrityError as e:
         sql.rollback()
         raise HTTPException(status_code=409, detail="Role already exists") from e
-
-    except OperationalError as e:
-        sql.rollback()
-        raise HTTPException(status_code=503, detail="Internal server error") from e
-
-    except ResponseValidationError as e:
-        sql.rollback()
-        raise HTTPException(status_code=400, detail="Invalid request") from e
-
-    except SQLAlchemyError as e:
-        raise HTTPException(status_code=500, detail="Internal server error") from e
 
     except Exception as e:
         sql.rollback()
@@ -97,24 +77,14 @@ def update_role(sql: Session, data: RoleUpdate, role_id: int) -> RoleResponse:
         sql.commit()
         sql.refresh(role)
         return RoleResponse.model_validate(role)
+    
     except HTTPException as e:
         raise e
+    
     except IntegrityError as e:
         sql.rollback()
         raise HTTPException(status_code=409, detail="Role already exists") from e
-
-    except OperationalError as e:
-        sql.rollback()
-        raise HTTPException(status_code=503, detail="Internal server error") from e
-
-    except ResponseValidationError as e:
-        sql.rollback()
-        raise HTTPException(status_code=422, detail="Invalid request") from e
-
-    except SQLAlchemyError as e:
-        sql.rollback()
-        raise HTTPException(status_code=500, detail="Internal server error") from e
-
+    
     except Exception as e:
         sql.rollback()
         raise HTTPException(status_code=500, detail="Internal server error") from e
@@ -141,17 +111,9 @@ def get_role(sql: Session, role_id: int) -> RoleResponse:
 
     except HTTPException as e:
         raise e
-
-    except ResponseValidationError as e:
-        raise HTTPException(status_code=422, detail="Invalid request") from e
-
-    except OperationalError as e:
-        raise HTTPException(status_code=503, detail="Internal server error") from e
-
-    except SQLAlchemyError as e:
-        raise HTTPException(status_code=500, detail="Internal server error") from e
-
+    
     except Exception as e:
+        sql.rollback()
         raise HTTPException(status_code=500, detail="Internal server error") from e
     
     
@@ -168,15 +130,6 @@ def delete_role(sql: Session, role_id: int):
 
     except HTTPException as e:
         raise e
-
-    except ResponseValidationError as e:
-        raise HTTPException(status_code=422, detail="Invalid request") from e
-
-    except OperationalError as e:
-        raise HTTPException(status_code=503, detail="Internal server error") from e
-
-    except SQLAlchemyError as e:
-        raise HTTPException(status_code=500, detail="Internal server error") from e
 
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error") from e
