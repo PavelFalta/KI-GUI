@@ -1,17 +1,13 @@
-import {Text, View, TextInput} from 'react-native';
+import { TextInput } from 'react-native';
+import { styles } from '@/constants/Styles';
 
-
-export function FormInput({label, placeholder, value, onChangeText, secureTextEntry = false, keyboardType}) {
-    return (
-        <View>
-            <Text>{label}</Text>
-            <TextInput
-                placeholder = {placeholder}
-                value = {value}
-                onChangeText={onChangeText}
-                secureTextEntry = {secureTextEntry}
-                keyboardType={keyboardType}
-            />
-        </View>
-    );
+export function DocInput({ placeholder, onChangeText, secureTextEntry = false }) {
+  return (
+    <TextInput
+      placeholder = {placeholder}
+      onChangeText={(newText) => onChangeText(newText)}
+      secureTextEntry = {secureTextEntry}
+      style = {styles.input}
+    />
+  );
 };

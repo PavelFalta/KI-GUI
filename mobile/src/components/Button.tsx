@@ -1,10 +1,10 @@
-import { Button } from 'react-native';
-import { Link } from 'expo-router';
+import { TouchableOpacity, Text } from 'react-native';
+import { styles } from '@/constants/Styles';
 
-export function GenericButton({title, href}) {
-  return (
-    <Link href={href} onChild>
-      <Button title={title} />
-    </Link>
-  );
-}
+export function DocButton({ title, onPress }) {
+	return (
+    <TouchableOpacity onPress={onPress} style={styles.button}>
+      <Text style={styles.buttonText}>{title}</Text>
+    </TouchableOpacity>
+	);
+};
