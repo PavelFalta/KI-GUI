@@ -34,16 +34,16 @@ class User(Base):
     email = Column(String(120), unique=True, nullable=False)
     password = Column(Text, nullable=False)
     created_at = Column(DateTime, nullable=False, default=datetime.now)
-    fk_role = Column(Integer, ForeignKey("roles.id"), nullable=False)
+    role_id = Column(Integer, ForeignKey("roles.id"), nullable=False)
     is_active = Column(Boolean, nullable=False, default=True)
 
     role = relationship("Role", back_populates="users")
     tasks_created = relationship("Task", back_populates="creator")
     assigned_tasks = relationship(
-        "StudentTask", foreign_keys="StudentTask.student_id", back_populates="student"
+        "StudentTask", foreign_keys="[StudentTask.student_id]", back_populates="student"
     )
     assigned_by_tasks = relationship(
-        "StudentTask", foreign_keys="StudentTask.assigned_by", back_populates="assigner"
+        "StudentTask", foreign_keys="[StudentTask.assigned_by]", back_populates="assigner"
     )
 
 
@@ -54,31 +54,28 @@ class Task(Base):
     title = Column(String(50), unique=True, nullable=False)
     description = Column(String(100), nullable=True)
     created_at = Column(DateTime, nullable=False, default=datetime.now)
-    fk_status = Column(Integer, ForeignKey("statuses.id"), nullable=False)
-    fk_creator = Column(Integer, ForeignKey("users.id"), nullable=True)
+    status_id = Column(Integer, ForeignKey("statuses.id"), nullable=False)
+    creator_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     is_active = Column(Boolean, nullable=False, default=True)
 
     status = relationship("Status", back_populates="tasks")
     creator = relationship("User", back_populates="tasks_created")
-    students = relationship("StudentTask", back_populates="task")
+    student_tasks = relationship("StudentTask", back_populates="task")
 
 
 class StudentTask(Base):
     __tablename__ = "students_tasks"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    fk_student = Column(Integer, ForeignKey("users.id"), nullable=False)
-    fk_task = Column(Integer, ForeignKey("tasks.id"), nullable=False)
+    student_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    task_id = Column(Integer, ForeignKey("tasks.id"), nullable=False)
     assigned_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+    status_id = Column(Integer, ForeignKey("statuses.id"), nullable=True)
     enrollment_date = Column(DateTime, nullable=False, default=datetime.now)
     completed_at = Column(DateTime, nullable=True)
     is_active = Column(Boolean, nullable=False, default=True)
 
-    student = relationship(
-        "User", foreign_keys=[fk_student], back_populates="assigned_tasks"
-    )
-    task = relationship("Task", back_populates="students")
-    assigner = relationship(
-        "User", foreign_keys=[assigned_by], back_populates="assigned_by_tasks"
-    )
+    student = relationship("User", foreign_keys=[student_id], back_populates="assigned_tasks")
+    task = relationship("Task", back_populates="student_tasks")
+    assigner = relationship("User", foreign_keys=[assigned_by], back_populates="assigned_by_tasks")
     status = relationship("Status", back_populates="student_tasks")

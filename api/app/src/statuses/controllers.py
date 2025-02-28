@@ -23,7 +23,7 @@ def get_statuses(sql: Session) -> list[StatusResponse]:
             for status in sql.query(models.Status).all()
         ]
 
-    except ResponseValidationError() as e:
+    except ResponseValidationError as e:
         raise HTTPException(status_code=400, detail="Invalid request") from e
 
     except OperationalError as e:
@@ -138,6 +138,33 @@ def get_status(sql: Session, status_id: int) -> StatusResponse:
         if not status:
             raise HTTPException(status_code=404, detail="Status not found")
         return StatusResponse.model_validate(status)
+
+    except HTTPException as e:
+        raise e
+
+    except ResponseValidationError as e:
+        raise HTTPException(status_code=422, detail="Invalid request") from e
+
+    except OperationalError as e:
+        raise HTTPException(status_code=503, detail="Internal server error") from e
+
+    except SQLAlchemyError as e:
+        raise HTTPException(status_code=500, detail="Internal server error") from e
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal server error") from e
+    
+    
+def delete_status(sql: Session, status_id: int):
+    try:
+        status: models.Status | None = (
+            sql.query(models.Status).filter(models.Status.id == status_id).first()
+        )
+        if not status:
+            raise HTTPException(status_code=404, detail="Status not found")
+        sql.delete(status)
+        sql.commit()
+        # return StatusResponse.model_validate(status)
 
     except HTTPException as e:
         raise e

@@ -3,6 +3,7 @@ from typing import Annotated
 from app.annotations import ID_PATH_ANNOTATION
 from app.src.statuses.controllers import (
     create_status,
+    delete_status,
     get_statuses,
     update_status,
     get_status,
@@ -45,3 +46,10 @@ def endp_get_status(
     sql: Annotated[Session, Depends(get_sql)], status_id: ID_PATH_ANNOTATION
 ) -> StatusResponse:
     return get_status(sql=sql, status_id=status_id)
+
+
+@router.delete("/{status_id}", summary="Delete a status", operation_id="deleteStatus", status_code=204)
+def endp_delete_status(
+    status_id: ID_PATH_ANNOTATION, sql: Annotated[Session, Depends(get_sql)]
+) -> None:
+    return delete_status(sql=sql, status_id=status_id)
