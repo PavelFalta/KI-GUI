@@ -31,8 +31,11 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String(50), unique=True, nullable=False)
+    first_name = Column(String(50), nullable=False)
+    last_name = Column(String(50), nullable=False)
     email = Column(String(120), unique=True, nullable=False)
     password = Column(Text, nullable=False)
+    contact_number = Column(String(15), nullable=True)
     created_at = Column(DateTime, nullable=False, default=datetime.now)
     role_id = Column(Integer, ForeignKey("roles.id"), nullable=False)
     is_active = Column(Boolean, nullable=False, default=True)
@@ -54,6 +57,7 @@ class Task(Base):
     title = Column(String(50), unique=True, nullable=False)
     description = Column(String(100), nullable=True)
     created_at = Column(DateTime, nullable=False, default=datetime.now)
+    category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
     status_id = Column(Integer, ForeignKey("statuses.id"), nullable=False)
     creator_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     is_active = Column(Boolean, nullable=False, default=True)
@@ -73,9 +77,21 @@ class StudentTask(Base):
     status_id = Column(Integer, ForeignKey("statuses.id"), nullable=True)
     enrollment_date = Column(DateTime, nullable=False, default=datetime.now)
     completed_at = Column(DateTime, nullable=True)
+    feedback = Column(Text, nullable=True)
+    deadline = Column(DateTime, nullable=True)
     is_active = Column(Boolean, nullable=False, default=True)
 
     student = relationship("User", foreign_keys=[student_id], back_populates="assigned_tasks")
     task = relationship("Task", back_populates="student_tasks")
     assigner = relationship("User", foreign_keys=[assigned_by], back_populates="assigned_by_tasks")
     status = relationship("Status", back_populates="student_tasks")
+
+
+class Category(Base):
+    __tablename__ = "categories"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(50), unique=True, nullable=False)
+    description = Column(String(100), nullable=True)
+
+    task = relationship("Task", back_populates="category")
