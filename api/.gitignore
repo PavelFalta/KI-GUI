@@ -165,3 +165,6 @@ ZPRAC.csv
 properties.json
 alembic/versions/*.py
 alerts_client/*
+
+*.db
+*.png
