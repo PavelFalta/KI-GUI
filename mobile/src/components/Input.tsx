@@ -7,7 +7,7 @@ export function DocInput({ placeholder, onChangeText, secureTextEntry = false })
       placeholder = {placeholder}
       onChangeText={(newText) => onChangeText(newText)}
       secureTextEntry = {secureTextEntry}
-      style = {styles.input}
+      style = {[styles.container, styles.normal, styles.underline]}
     />
   );
 }

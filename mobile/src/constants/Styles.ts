@@ -1,49 +1,73 @@
 import { StyleSheet } from 'react-native';
 
 export const colors = {
-  text: '#fff',
-  inactive: '#929497',
-  background: '#25292e',
+  white: '#fff',
+  grey: '#3a4147',
+  black: '#25292e',
+  blue: '#007bff',
+  yellow: '#ffcc00',
+  green: '#28a745',
 };
 
 export const styles = StyleSheet.create({
   view: {
     flex: 1,
     padding: 10,
-    backgroundColor: colors.background,
     alignItems: 'center',
-    // justifyContent: 'center',
+    backgroundColor: colors.black,
   },
-  text: {
-    color: colors.text,
-    textAlign: 'center',
-  },
-  button: {
-    backgroundColor: colors.text,
+  container: {
+    margin: 5,
     paddingHorizontal: 7,
     paddingVertical: 5,
     borderRadius: 5,
-    margin: 5,
   },
-  buttonText: {
-    color: colors.background,
+  normal: {
+    color: colors.white,
+    backgroundColor: colors.black,
+  },
+  highlighted: {
+    color: colors.white,
+    backgroundColor: colors.grey,
+  },
+  inverted: {
+    color: colors.black,
+    backgroundColor: colors.white,
+  },
+  bold: {
     fontWeight: 'bold',
   },
-  input: {
-    paddingHorizontal: 7,
-    paddingVertical: 5,
-    color: colors.inactive,
-    borderColor: colors.text,
+  underline: {
+    borderColor: colors.white,
     borderBottomWidth: 2,
-    margin: 5,
+  },
+  fixedWidth: {
+    width: 250,
   },
 });
 
 export const screens = {
   headerStyle: {
-    color: colors.text,
-    backgroundColor: colors.background,
+    color: colors.white,
+    backgroundColor: colors.black,
   },
-  headerTintColor: colors.text,
+  headerTintColor: colors.white,
   headerShadowVisible: false,
+};
+
+export const bars = {
+  width: styles.fixedWidth.width-2*styles.container.paddingHorizontal,
+  height: 3,
+  indeterminateAnimationDuration: 3000,
+  determineColor: (progress, pendingApproval) => {
+    if (progress == 1) {
+      if (pendingApproval) {
+        return colors.yellow
+      } else {
+        return colors.green
+      }
+    } else {
+      return colors.white
+    }
+  }
 };

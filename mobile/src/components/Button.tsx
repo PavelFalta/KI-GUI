@@ -4,7 +4,7 @@ import { styles } from '@/constants/Styles';
 export function DocButton({ title, onPress }) {
 	return (
     <TouchableOpacity onPress={onPress} style={styles.button}>
-      <Text style={styles.buttonText}>{title}</Text>
+      <Text style={[styles.container, styles.inverted, styles.bold]}>{title}</Text>
     </TouchableOpacity>
 	);
 }
