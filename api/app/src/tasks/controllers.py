@@ -115,17 +115,30 @@ def get_task(sql: Session, task_id: int) -> TaskResponse:
 
 
 def delete_task(sql: Session, task_id: int):
+    """Soft delete a task by setting is_active to False
+
+    Args:
+        sql (Session): Database session
+        task_id (int): ID of the task to delete
+
+    Raises:
+        HTTPException: 404 if task not found
+        HTTPException: 500 for any other errors
+    """
     try:
         task: models.Task | None = (
             sql.query(models.Task).filter(models.Task.id == task_id).first()
         )
         if not task:
             raise HTTPException(status_code=404, detail="Task not found")
-        sql.delete(task)
+        
+        task.is_active = False
         sql.commit()
+        sql.refresh(task)
 
     except HTTPException as e:
         raise e
 
     except Exception as e:
+        sql.rollback()
         raise HTTPException(status_code=500, detail="Internal server error") from e
