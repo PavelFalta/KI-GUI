@@ -17,6 +17,6 @@ class StatusResponse(StatusBase):
 
 
 class StatusUpdate(BaseModel):
-    name: str | None = None
-    description: str | None = None
+    name: str | None = Field(None, min_length=1, max_length=50)
+    description: str | None = Field(None, min_length=1, max_length=100)
 
