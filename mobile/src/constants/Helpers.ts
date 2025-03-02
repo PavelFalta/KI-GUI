@@ -5,8 +5,8 @@ export function navigate({ route }) {
     router.back();
   }
   router.replace(route)
-};
+}
 
 export function navigateWithHistory({ route }) {
   router.navigate(route)
-};
+}

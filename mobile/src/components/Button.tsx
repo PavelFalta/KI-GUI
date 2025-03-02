@@ -7,4 +7,4 @@ export function DocButton({ title, onPress }) {
       <Text style={styles.buttonText}>{title}</Text>
     </TouchableOpacity>
 	);
-};
+}

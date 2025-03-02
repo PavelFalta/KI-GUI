@@ -7,4 +7,4 @@ export function Course({ title, progress, status }) {
       <Text>{status}</Text>
     </Pressable>
   );
-}; 
+}

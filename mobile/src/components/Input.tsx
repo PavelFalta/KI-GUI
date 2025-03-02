@@ -10,4 +10,4 @@ export function DocInput({ placeholder, onChangeText, secureTextEntry = false })
       style = {styles.input}
     />
   );
-};
+}
