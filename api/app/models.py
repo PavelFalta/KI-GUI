@@ -35,7 +35,7 @@ class User(Base):
     last_name = Column(String(50), nullable=False)
     email = Column(String(120), unique=True, nullable=False)
     password = Column(Text, nullable=False)
-    contact_number = Column(String(15), nullable=True)
+    contact_number = Column(String(15), nullable=True)  # Unique?
     created_at = Column(DateTime, nullable=False, default=datetime.now)
     role_id = Column(Integer, ForeignKey("roles.id"), nullable=False)
     is_active = Column(Boolean, nullable=False, default=True)
