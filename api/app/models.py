@@ -65,6 +65,7 @@ class Task(Base):
     status = relationship("Status", back_populates="tasks")
     creator = relationship("User", back_populates="tasks_created")
     student_tasks = relationship("StudentTask", back_populates="task")
+    category = relationship("Category", back_populates="task")
 
 
 class StudentTask(Base):
