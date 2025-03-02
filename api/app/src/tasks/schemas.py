@@ -36,8 +36,8 @@ class TaskResponse(BaseModel):
 
 
 class TaskUpdate(BaseModel):
-    title: str | None = None
-    description: str | None = None
+    title: str | None = Field(None, min_length=1, max_length=50)
+    description: str | None = Field(None, min_length=1, max_length=100)
     category_id: int | None = None
     status_id: int | None = None
     is_active: bool | None = None
