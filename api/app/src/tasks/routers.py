@@ -9,6 +9,7 @@ from app.src.tasks.controllers import (
     get_tasks,
 )
 from app.src.tasks.schemas import TaskCreate, TaskResponse, TaskUpdate
+from app.src.users.schemas import UserResponse
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.database import get_sql
@@ -25,9 +26,9 @@ def endp_get_tasks(
 
 @router.post("", summary="Create a task", operation_id="createTasks")
 def endp_create_task(
-    sql: Annotated[Session, Depends(get_sql)], data: TaskCreate
+    sql: Annotated[Session, Depends(get_sql)], data: TaskCreate, current_user: UserResponse
 ) -> TaskResponse:
-    return create_task(sql=sql, data=data)
+    return create_task(sql=sql, data=data, current_user=current_user)
 
 
 @router.put("/{task_id}", summary="Update a task", operation_id="updateTask")

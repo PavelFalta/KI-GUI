@@ -2,49 +2,105 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from app import models
 from app.src.tasks.schemas import TaskCreate, TaskResponse, TaskUpdate
+from app.src.users.schemas import UserResponse
 from sqlalchemy.exc import IntegrityError
 
 
 def get_tasks(sql: Session) -> list[TaskResponse]:
-    """_summary_
+    """Get all tasks from the database
 
     Args:
-        sql (Session): _description_
+        sql (Session): Database session
 
 
     Returns:
-        list[TaskResponse]: _description_
+        list[TaskResponse]: A list of all tasks
+    
+    Raises:
+        HTTPException: 404 if no tasks are found
+        HTTPException: 500 for any other errors
     """
     try:
-        return [
-            TaskResponse.model_validate(task) for task in sql.query(models.Task).all()
-        ]
+        tasks: list[TaskResponse] | None = [TaskResponse.model_validate(task) for task in sql.query(models.Task).all()]
+        if not tasks:
+            raise HTTPException(status_code=404, detail="Task not found")
+        return tasks
+
+    except HTTPException as e:
+        raise e
 
     except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error") from e
 
 
-def create_task(sql: Session, data: TaskCreate) -> TaskResponse:
-    """_summary_
+def create_task(
+    sql: Session, data: TaskCreate, current_user: UserResponse
+) -> TaskResponse:
+    """Create a new task
+
+    This function creates a new task with the currently logged in user as creator.
+    Sets default category to "Uncategorized" if not specified.
 
     Args:
-        sql (Session): _description_
-        data (TaskCreate): _description_
+        sql (Session): Database session
+        data (TaskCreate): Task data from request
+        current_user (UserResponse): Currently logged in user from token
 
     Returns:
-        StatusResponse: _description_
+        TaskResponse: Created task
+
+    Raises:
+        HTTPException: 403 if user doesn't have required role
+        HTTPException: 409 if task already exists
+        HTTPException: 500 for other errors
     """
     try:
-        new_task: models.Task = models.Task(**data.model_dump())
+        if (
+            current_user.role_id != 1  # Admin = role_id 1?
+        ):
+            raise HTTPException(
+                status_code=403, detail="Only administrators can create tasks"
+            )
+
+        if not data.category_id:
+            uncategorized = (
+                sql.query(models.Category)
+                .filter(models.Category.name == "Uncategorized")
+                .first()
+            )  # Check jestli existuje kategorie Uncategorized
+
+            if not uncategorized:
+                uncategorized = models.Category(
+                    name="uncategorized",
+                    description="Default category for uncategorized tasks",
+                )
+                sql.add(uncategorized)  # Přidání kategorie Uncategorized do databáze
+                sql.commit()
+                sql.refresh(uncategorized)
+
+            data.category_id = uncategorized.id
+
+        task_data = data.model_dump()
+        task_data["creator_id"] = current_user.id
+
+        new_task: models.Task = models.Task(**task_data)  # New task from data dud
         sql.add(new_task)
         sql.commit()
         sql.refresh(new_task)
 
-        return TaskResponse.model_validate(new_task)
+        task_to_validate = (
+            sql.query(models.Task).filter(models.Task.id == new_task.id).first()
+        )
+
+        return TaskResponse.model_validate(task_to_validate)
 
     except IntegrityError as e:
         sql.rollback()
         raise HTTPException(status_code=409, detail="Task already exists") from e
+
+    except HTTPException as e:
+        sql.rollback()
+        raise e
 
     except Exception as e:
         sql.rollback()
@@ -52,15 +108,20 @@ def create_task(sql: Session, data: TaskCreate) -> TaskResponse:
 
 
 def update_task(sql: Session, data: TaskUpdate, task_id: int) -> TaskResponse:
-    """_summary_
+    """Update a task by ID
 
     Args:
-        sql (Session): _description_
-        data (TaskUpdate): _description_
-        task_id (int): _description_
+        sql (Session): Database session
+        data (TaskUpdate): Task data from request
+        task_id (int): ID of the task to update
 
     Returns:
-        TaskResponse: _description_
+        TaskResponse: Updated task
+    
+    Raises:
+        HTTPException: 404 if task not found
+        HTTPException: 409 if task already exists
+        HTTPException: 500 for any other errors
     """
     try:
         task: models.Task = (
@@ -88,15 +149,18 @@ def update_task(sql: Session, data: TaskUpdate, task_id: int) -> TaskResponse:
 
 
 def get_task(sql: Session, task_id: int) -> TaskResponse:
-    """
+    """Get a task by ID
 
     Args:
-        sql (Session): _description_
-        task_id (int): _description_
-
+        sql (Session): Database session
+        task_id (int): ID of the task to get
 
     Returns:
-        TaskResponse: _description_
+        TaskResponse: Task data
+
+    Raises:
+        HTTPException: 404 if task not found
+        HTTPException: 500 for any other errors
     """
     try:
         task: models.Task | None = (
@@ -110,7 +174,6 @@ def get_task(sql: Session, task_id: int) -> TaskResponse:
         raise e
 
     except Exception as e:
-        sql.rollback()
         raise HTTPException(status_code=500, detail="Internal server error") from e
 
 
@@ -131,7 +194,7 @@ def delete_task(sql: Session, task_id: int):
         )
         if not task:
             raise HTTPException(status_code=404, detail="Task not found")
-        
+
         task.is_active = False
         sql.commit()
         sql.refresh(task)
