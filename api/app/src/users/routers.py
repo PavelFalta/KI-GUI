@@ -1,6 +1,7 @@
 from typing import Annotated
 from app.annotations import ID_PATH_ANNOTATION
 from app.database import get_sql
+from app.src.users.controllers import create_user
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -21,7 +22,7 @@ def endp_get_users(
 def endp_create_user(
     sql: Annotated[Session, Depends(get_sql)], data: UserCreate
 ) -> UserResponse:
-    pass
+    return create_user(sql, data)
 
 
 @router.put("/{user_id}", summary="Update a user", operation_id="updateUser")
