@@ -23,4 +23,4 @@ export default function LoginScreen() {
       <DocButton title="Login" onPress={() => navigate({route: 'courses'})} />
     </View>
   );
-};
+}

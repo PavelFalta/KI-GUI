@@ -1,10 +1,12 @@
 import { Text, View } from 'react-native';
 import { styles } from '@/constants/Styles';
+import { Course } from '@/components/Course';
 
 export default function CoursesScreen() {
   return (
     <View style={styles.view}>
-      <Text style={styles.text}>Welcome to DocSchool. It looks like you don't have any courses assigned.<br />Ask your instructor for further information.</Text>
+      <Course title="course one" progress={80} status="in progress"/>
+      <Course title="course two" progress={100} status="completed"/>
     </View>
   );
 }
