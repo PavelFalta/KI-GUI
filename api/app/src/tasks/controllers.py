@@ -78,8 +78,8 @@ def create_task(
 
             data.category_id = uncategorized.id
 
+        data.creator_id = current_user.id
         task_data = data.model_dump()
-        task_data["creator_id"] = current_user.id
 
         new_task: models.Task = models.Task(**task_data)  # New task from data dud
         sql.add(new_task)
@@ -124,7 +124,7 @@ def update_task(sql: Session, data: TaskUpdate, current_user: UserResponse, task
     try:
         if current_user.role_id != sql.query(models.Role).filter(models.Role.name == "admin").first().id:
             raise HTTPException(
-                status_code=403, detail="Only administrators can create tasks"
+                status_code=403, detail="Only administrators can update tasks"
             )
         task: models.Task = (
             sql.query(models.Task).filter(models.Task.id == task_id).first()
