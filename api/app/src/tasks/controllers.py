@@ -55,9 +55,7 @@ def create_task(
         HTTPException: 500 for other errors
     """
     try:
-        if (
-            current_user.role_id != 1  # Admin = role_id 1?
-        ):
+        if current_user.role_id != sql.query(models.Role).filter(models.Role.name == "admin").first().id:
             raise HTTPException(
                 status_code=403, detail="Only administrators can create tasks"
             )
@@ -107,7 +105,7 @@ def create_task(
         raise HTTPException(status_code=500, detail="Internal server error") from e
 
 
-def update_task(sql: Session, data: TaskUpdate, task_id: int) -> TaskResponse:
+def update_task(sql: Session, data: TaskUpdate, current_user: UserResponse, task_id: int) -> TaskResponse:
     """Update a task by ID
 
     Args:
@@ -124,6 +122,10 @@ def update_task(sql: Session, data: TaskUpdate, task_id: int) -> TaskResponse:
         HTTPException: 500 for any other errors
     """
     try:
+        if current_user.role_id != sql.query(models.Role).filter(models.Role.name == "admin").first().id:
+            raise HTTPException(
+                status_code=403, detail="Only administrators can create tasks"
+            )
         task: models.Task = (
             sql.query(models.Task).filter(models.Task.id == task_id).first()
         )
@@ -177,7 +179,7 @@ def get_task(sql: Session, task_id: int) -> TaskResponse:
         raise HTTPException(status_code=500, detail="Internal server error") from e
 
 
-def delete_task(sql: Session, task_id: int):
+def delete_task(sql: Session, current_user: UserResponse, task_id: int):
     """Soft delete a task by setting is_active to False
 
     Args:
@@ -189,6 +191,10 @@ def delete_task(sql: Session, task_id: int):
         HTTPException: 500 for any other errors
     """
     try:
+        if current_user.role_id != sql.query(models.Role).filter(models.Role.name == "admin").first().id:
+            raise HTTPException(
+                status_code=403, detail="Only administrators can delete tasks"
+            )
         task: models.Task | None = (
             sql.query(models.Task).filter(models.Task.id == task_id).first()
         )

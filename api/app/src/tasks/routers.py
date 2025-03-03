@@ -36,8 +36,9 @@ def endp_update_task(
     task_id: ID_PATH_ANNOTATION,
     sql: Annotated[Session, Depends(get_sql)],
     data: TaskUpdate,
+    current_user: UserResponse,
 ) -> TaskResponse:
-    return update_task(sql=sql, data=data, task_id=task_id)
+    return update_task(sql=sql, data=data, current_user=current_user, task_id=task_id)
 
 
 @router.get("/{task_id}", summary="Get a task", operation_id="getTask")
@@ -51,6 +52,6 @@ def endp_get_task(
     "/{task_id}", summary="Delete a task", operation_id="deleteTask", status_code=204
 )
 def endp_delete_task(
-    task_id: ID_PATH_ANNOTATION, sql: Annotated[Session, Depends(get_sql)]
+    task_id: ID_PATH_ANNOTATION, sql: Annotated[Session, Depends(get_sql)], current_user: UserResponse
 ) -> None:
-    return delete_task(sql=sql, task_id=task_id)
+    return delete_task(sql=sql, task_id=task_id, current_user=current_user)

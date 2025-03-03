@@ -1,8 +1,8 @@
 from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
 from ..statuses.schemas import StatusResponse
-from ..categories.schemas import CategoryResponse  # To Do
-from ..users.schemas import UserResponse  # To Do
+from ..categories.schemas import CategoryResponse
+from ..users.schemas import UserResponse
 
 
 class TaskBase(BaseModel):
@@ -29,8 +29,8 @@ class TaskResponse(BaseModel):
     is_active: bool
 
     status: StatusResponse | None = None
-    category: CategoryResponse | None = None  # To Do
-    creator: UserResponse | None = None  # To Do
+    category: CategoryResponse | None = None
+    creator: UserResponse | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
