@@ -21,10 +21,10 @@ def get_tasks(sql: Session) -> list[TaskResponse]:
         HTTPException: 500 for any other errors
     """
     try:
-        tasks: list[TaskResponse] | None = [TaskResponse.model_validate(task) for task in sql.query(models.Task).all()]
+        tasks: list[models.Task] = sql.query(models.Task).all()
         if not tasks:
             raise HTTPException(status_code=404, detail="Task not found")
-        return tasks
+        return [TaskResponse.model_validate(task) for task in tasks]
 
     except HTTPException as e:
         raise e
