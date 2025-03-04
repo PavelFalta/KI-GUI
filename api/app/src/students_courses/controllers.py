@@ -119,9 +119,7 @@ def update_student_course(
     """
     try:
         student_course = (
-            sql.query(models.StudentCourse)
-            .filter(models.StudentCourse.id == student_course_id)
-            .first()
+            sql.get(models.StudentCourse, student_course_id)
         )
         if not student_course:
             raise HTTPException(
@@ -130,25 +128,18 @@ def update_student_course(
 
         if data.student_id is not None:
             if (
-                not sql.query(models.User)
-                .filter(models.User.id == data.student_id)
-                .first()
+                not sql.get(models.User, data.student_id)
             ):
                 raise HTTPException(status_code=404, detail="Student not found")
 
         if data.course_id is not None:
             if (
-                not sql.query(models.Course)
-                .filter(models.Course.id == data.course_id)
-                .first()
-            ):
+                not sql.get(models.Course, data.course_id)):
                 raise HTTPException(status_code=404, detail="Course not found")
 
         if data.assigned_by is not None:
             if (
-                not sql.query(models.User)
-                .filter(models.User.id == data.assigned_by)
-                .first()
+                not sql.get(models.User, data.assigned_by)
             ):
                 raise HTTPException(status_code=404, detail="Assigner not found")
 
@@ -191,9 +182,7 @@ def get_student_course(sql: Session, student_course_id: int) -> StudentCourseRes
     """
     try:
         student_course = (
-            sql.query(models.StudentCourse)
-            .filter(models.StudentCourse.id == student_course_id)
-            .first()
+            sql.get(models.StudentCourse, student_course_id)
         )
         if not student_course:
             raise HTTPException(
@@ -222,9 +211,7 @@ def delete_student_course(sql: Session, student_course_id: int):
     """
     try:
         student_course = (
-            sql.query(models.StudentCourse)
-            .filter(models.StudentCourse.id == student_course_id)
-            .first()
+            sql.get(models.StudentCourse, student_course_id)
         )
         if not student_course:
             raise HTTPException(
