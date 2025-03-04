@@ -25,7 +25,7 @@ class User(Base):
     email = Column(String(120), nullable=False)
     password = Column(Text, nullable=False)
     contact_number = Column(String(15))
-    created_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc))
+    created_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc))  # noqa: UP017
     role_id = Column(Integer, ForeignKey("roles.id"), nullable=False)
     is_active = Column(Boolean, nullable=False)
 
@@ -63,7 +63,7 @@ class Course(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     title = Column(String(50), nullable=False)
     description = Column(String(100))
-    created_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc))
+    created_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc))  # noqa: UP017
     category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
     creator_id = Column(Integer, ForeignKey("users.id"))
     is_active = Column(Boolean, nullable=False)
@@ -99,7 +99,7 @@ class StudentCourse(Base):
     course_id = Column(Integer, ForeignKey("courses.id"), nullable=False)
     assigned_by = Column(Integer, ForeignKey("users.id"), nullable=False)
     enrollment_date = Column(
-        DateTime, nullable=False, default=datetime.now(timezone.utc)
+        DateTime, nullable=False, default=datetime.now(timezone.utc)  # noqa: UP017
     )
     feedback = Column(Text)
     deadline = Column(DateTime)
