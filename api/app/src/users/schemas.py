@@ -1,7 +1,8 @@
 from app.src.completion.schemas import CompletionResponse
-# from app.src.courses.schemas import CourseResponse
+
+from app.src.courses.schemas import CourseResponse
 from app.src.roles.schemas import RoleResponse
-# from app.src.students_tasks.schemas import StudentTaskResponse
+
 from app.src.students_courses.schemas import StudentCourseResponse
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -28,11 +29,6 @@ class UserResponse(UserBase):
 
     role: RoleResponse
 
-    # create_courses: list[CourseResponse] = []
-    # enrolled_courses: list[StudentTaskResponse] = []
-    # assigned_courses: list[StudentCourseResponse] = []
-    # task_completions: list[CompletionResponse] = []
-
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -47,3 +43,12 @@ class UserUpdate(BaseModel):
     role_id: int | None = None
     is_active: bool | None = None
     password: str | None = Field(None, min_length=6, max_length=50)
+
+
+class UserResponseTasksAndCourses(UserResponse):
+    created_courses: list[CourseResponse] = []
+    enrolled_courses: list[StudentCourseResponse] = []
+    assigned_courses: list[StudentCourseResponse] = []
+    task_completions: list[CompletionResponse] = []
+
+    model_config = ConfigDict(from_attributes=True)

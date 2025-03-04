@@ -1,5 +1,10 @@
 from app import models
-from app.src.users.schemas import UserCreate, UserResponse, UserUpdate
+from app.src.users.schemas import (
+    UserCreate,
+    UserResponse,
+    UserResponseTasksAndCourses,
+    UserUpdate,
+)
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError, OperationalError
@@ -93,3 +98,11 @@ def update_user(sql: Session, user_id: int, data: UserUpdate) -> UserResponse:
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Unexpected error") from e
+
+
+def get_user_tasks_and_courses(
+    sql: Session, user_id: int
+) -> UserResponseTasksAndCourses:
+    return UserResponseTasksAndCourses.model_validate(
+        sql.query(models.User).get(user_id)
+    )
