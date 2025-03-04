@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
-from ..courses.schemas import CourseResponse
-from ..users.schemas import UserResponse
+# from ..courses.schemas import CourseResponse
+# from ..users.schemas import UserResponse
 
 
 class StudentCourseBase(BaseModel):
@@ -21,9 +21,9 @@ class StudentCourseCreate(StudentCourseBase):
 class StudentCourseResponse(StudentCourseBase):
     id: int
     
-    student: UserResponse | None = None
-    course: CourseResponse | None = None
-    assigner: UserResponse | None = None
+    # student: UserResponse | None = None
+    # course: CourseResponse | None = None
+    # assigner: UserResponse | None = None
 
     model_config = ConfigDict(from_attributes=True)
 

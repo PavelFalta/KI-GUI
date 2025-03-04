@@ -1,4 +1,8 @@
+from app.src.completion.schemas import CompletionResponse
+# from app.src.courses.schemas import CourseResponse
 from app.src.roles.schemas import RoleResponse
+# from app.src.students_tasks.schemas import StudentTaskResponse
+from app.src.students_courses.schemas import StudentCourseResponse
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -23,6 +27,11 @@ class UserResponse(UserBase):
     id: int
 
     role: RoleResponse
+
+    # create_courses: list[CourseResponse] = []
+    # enrolled_courses: list[StudentTaskResponse] = []
+    # assigned_courses: list[StudentCourseResponse] = []
+    # task_completions: list[CompletionResponse] = []
 
     model_config = ConfigDict(from_attributes=True)
 
