@@ -31,13 +31,17 @@ class User(Base):
 
     role = relationship("Role", back_populates="users")
     created_courses = relationship(
-        "Course", back_populates="creator", foreign_keys="Course.creator_id"
+        "Course", back_populates="creator", foreign_keys="[Course.creator_id]"
     )
-    enrolled_courses = relationship("StudentCourse", back_populates="student")
+    enrolled_courses = relationship(
+        "StudentCourse",
+        back_populates="student",
+        foreign_keys="[StudentCourse.student_id]",
+    )
     assigned_courses = relationship(
         "StudentCourse",
         back_populates="assigner",
-        foreign_keys="StudentCourse.assigned_by",
+        foreign_keys="[StudentCourse.assigned_by]",
     )
     task_completions = relationship("Completion", back_populates="student")
 
