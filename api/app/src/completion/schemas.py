@@ -6,7 +6,7 @@ class CompletionBase(BaseModel):
     student_id: int
     task_id: int
     is_active: bool = False
-    is_completed: datetime | None = None
+    completed_at: datetime | None = None
     
 
 class CompletionCreate(CompletionBase):
