@@ -9,8 +9,8 @@ export const colors = {
   green: '#28a745',
 };
 
-export const styles = StyleSheet.create({
-  view: {
+export const classes = StyleSheet.create({
+  page: {
     flex: 1,
     padding: 10,
     alignItems: 'center',
@@ -41,12 +41,9 @@ export const styles = StyleSheet.create({
     borderColor: colors.white,
     borderBottomWidth: 2,
   },
-  fixedWidth: {
-    width: 250,
-  },
 });
 
-export const screens = {
+export const header = {
   headerStyle: {
     color: colors.white,
     backgroundColor: colors.black,
@@ -55,19 +52,7 @@ export const screens = {
   headerShadowVisible: false,
 };
 
-export const bars = {
-  width: styles.fixedWidth.width-2*styles.container.paddingHorizontal,
+export const bar = {
+  color: colors.white,
   height: 3,
-  indeterminateAnimationDuration: 3000,
-  determineColor: (progress, pendingApproval) => {
-    if (progress == 1) {
-      if (pendingApproval) {
-        return colors.yellow
-      } else {
-        return colors.green
-      }
-    } else {
-      return colors.white
-    }
-  }
 };
