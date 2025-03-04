@@ -15,7 +15,7 @@ def get_tasks(sql: Session) -> list[TaskResponse]:
 
     Returns:
         list[TaskResponse]: A list of all tasks
-    
+
     Raises:
         HTTPException: 404 if no tasks are found
         HTTPException: 500 for any other errors
@@ -34,7 +34,8 @@ def get_tasks(sql: Session) -> list[TaskResponse]:
 
 
 def create_task(
-    sql: Session, data: TaskCreate, current_user: UserResponse
+    sql: Session,
+    data: TaskCreate,
 ) -> TaskResponse:
     """Create a new task
 
@@ -44,7 +45,6 @@ def create_task(
     Args:
         sql (Session): Database session
         data (TaskCreate): Task data from request
-        current_user (UserResponse): Currently logged in user from token
 
     Returns:
         TaskResponse: Created task
@@ -55,30 +55,7 @@ def create_task(
         HTTPException: 500 for other errors
     """
     try:
-        if current_user.role_id != sql.query(models.Role).filter(models.Role.name == "admin").first().id:
-            raise HTTPException(
-                status_code=403, detail="Only administrators can create tasks"
-            )
 
-        if not data.category_id:
-            uncategorized = (
-                sql.query(models.Category)
-                .filter(models.Category.name == "Uncategorized")
-                .first()
-            )  # Check jestli existuje kategorie Uncategorized
-
-            if not uncategorized:
-                uncategorized = models.Category(
-                    name="uncategorized",
-                    description="Default category for uncategorized tasks",
-                )
-                sql.add(uncategorized)  # Přidání kategorie Uncategorized do databáze
-                sql.commit()
-                sql.refresh(uncategorized)
-
-            data.category_id = uncategorized.id
-
-        data.creator_id = current_user.id
         task_data = data.model_dump()
 
         new_task: models.Task = models.Task(**task_data)  # New task from data dud
@@ -105,7 +82,9 @@ def create_task(
         raise HTTPException(status_code=500, detail="Internal server error") from e
 
 
-def update_task(sql: Session, data: TaskUpdate, current_user: UserResponse, task_id: int) -> TaskResponse:
+def update_task(
+    sql: Session, data: TaskUpdate, task_id: int
+) -> TaskResponse:
     """Update a task by ID
 
     Args:
@@ -115,17 +94,14 @@ def update_task(sql: Session, data: TaskUpdate, current_user: UserResponse, task
 
     Returns:
         TaskResponse: Updated task
-    
+
     Raises:
         HTTPException: 404 if task not found
         HTTPException: 409 if task already exists
         HTTPException: 500 for any other errors
     """
     try:
-        if current_user.role_id != sql.query(models.Role).filter(models.Role.name == "admin").first().id:
-            raise HTTPException(
-                status_code=403, detail="Only administrators can update tasks"
-            )
+        
         task: models.Task = (
             sql.query(models.Task).filter(models.Task.id == task_id).first()
         )
@@ -191,10 +167,7 @@ def delete_task(sql: Session, current_user: UserResponse, task_id: int):
         HTTPException: 500 for any other errors
     """
     try:
-        if current_user.role_id != sql.query(models.Role).filter(models.Role.name == "admin").first().id:
-            raise HTTPException(
-                status_code=403, detail="Only administrators can delete tasks"
-            )
+       
         task: models.Task | None = (
             sql.query(models.Task).filter(models.Task.id == task_id).first()
         )
