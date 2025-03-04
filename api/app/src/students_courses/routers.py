@@ -39,7 +39,7 @@ def endp_update_student_course(
     data: StudentCourseUpdate,
 ) -> StudentCourseResponse:
     pass
-    # return update_student_course(sql=sql, data=data, student_course_id=student_course_id)
+    return update_student_course(sql=sql, data=data, student_course_id=student_course_id)
 
 
 @router.get("/{student_course_id}", summary="Get a student course enrollment", operation_id="getStudentCourse")
