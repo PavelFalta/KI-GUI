@@ -1,4 +1,5 @@
-from pydantic import BaseModel, Field
+from app.src.roles.schemas import RoleResponse
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class UserBase(BaseModel):
@@ -9,16 +10,21 @@ class UserBase(BaseModel):
 
     contact_number: str | None = Field(None, min_length=9, max_length=15)
 
-    role_id: int
     is_active: bool = True
 
 
 class UserCreate(UserBase):
+    role_id: int
+
     password: str = Field(..., min_length=6, max_length=50)
 
 
 class UserResponse(UserBase):
     id: int
+
+    role: RoleResponse
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserUpdate(BaseModel):

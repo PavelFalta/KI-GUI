@@ -1,6 +1,12 @@
 from typing import Annotated
 from app.annotations import ID_PATH_ANNOTATION
 from app.database import get_sql
+from app.src.categories.controllers import (
+    create_category,
+    get_categories,
+    get_category,
+    update_category,
+)
 from app.src.categories.schemas import CategoryCreate, CategoryResponse, CategoryUpdate
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
@@ -13,14 +19,14 @@ router = APIRouter(prefix="/categories", tags=["Categories"])
 def endp_get_categories(
     sql: Annotated[Session, Depends(get_sql)],
 ) -> list[CategoryResponse]:
-    pass
+    return get_categories(sql)
 
 
 @router.post("", summary="Create a category", operation_id="createCategories")
 def endp_create_category(
     sql: Annotated[Session, Depends(get_sql)], data: CategoryCreate
 ) -> CategoryResponse:
-    pass
+    return create_category(sql, data)
 
 
 @router.put(
@@ -31,11 +37,11 @@ def endp_update_category(
     sql: Annotated[Session, Depends(get_sql)],
     data: CategoryUpdate,
 ) -> CategoryResponse:
-    pass
+    return update_category(sql, category_id, data)
 
 
 @router.get("/{category_id}", summary="Get a category", operation_id="getCategory")
 def endp_get_category(
     sql: Annotated[Session, Depends(get_sql)], category_id: ID_PATH_ANNOTATION
 ) -> CategoryResponse:
-    pass
+    return get_category(sql, category_id)

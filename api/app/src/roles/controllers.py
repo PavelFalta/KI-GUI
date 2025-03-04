@@ -24,6 +24,7 @@ def get_roles(sql: Session) -> list[RoleResponse]:
         ]
 
     except Exception as e:
+        print(e)
         raise HTTPException(status_code=500, detail="Internal server error") from e
 
 
