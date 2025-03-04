@@ -1,4 +1,4 @@
-# DocSchool Mobile -- vývojářská příručka
+# DocSchool Mobile - vývojářská dokumentace
 
 Tento dokument definuje standardy pro vývoj a implementaci a popisuje některé části již zavedeného kódu.
 

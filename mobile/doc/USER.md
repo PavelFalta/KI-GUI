@@ -1,4 +1,4 @@
-# DocSchool Mobile -- uživatelská dokumentace
+# DocSchool Mobile - uživatelská dokumentace
 
 Tento dokument definuje, jak má aplikace vypadat a jak se má chovat z uživatelského hlediska.
 
