@@ -54,19 +54,19 @@ def create_student_course(
     """
     try:
         student = (
-            sql.query(models.User).filter(models.User.id == data.student_id).first()
+            sql.get(models.User, data.student_id)
         )
         if not student:
             raise HTTPException(status_code=404, detail="Student not found")
 
         course = (
-            sql.query(models.Course).filter(models.Course.id == data.course_id).first()
+            sql.get(models.Course, data.course_id)
         )
         if not course:
             raise HTTPException(status_code=404, detail="Course not found")
 
         assigner = (
-            sql.query(models.User).filter(models.User.id == data.assigned_by).first()
+            sql.get(models.User, data.assigned_by)
         )
         if not assigner:
             raise HTTPException(status_code=404, detail="Assigner not found")
@@ -98,7 +98,80 @@ def create_student_course(
 def update_student_course(
     sql: Session, data: StudentCourseUpdate, student_course_id: int
 ) -> StudentCourseResponse:
-    return StudentCourseResponse()
+    """_summary_
+
+    Args:
+        sql (Session): _description_
+        data (StudentCourseUpdate): _description_
+        student_course_id (int): _description_
+
+    Raises:
+        HTTPException: _description_
+        HTTPException: _description_
+        HTTPException: _description_
+        HTTPException: _description_
+        e: _description_
+        HTTPException: _description_
+        HTTPException: _description_
+
+    Returns:
+        StudentCourseResponse: _description_
+    """
+    try:
+        student_course = (
+            sql.query(models.StudentCourse)
+            .filter(models.StudentCourse.id == student_course_id)
+            .first()
+        )
+        if not student_course:
+            raise HTTPException(
+                status_code=404, detail="Student course enrollment not found"
+            )
+
+        if data.student_id is not None:
+            if (
+                not sql.query(models.User)
+                .filter(models.User.id == data.student_id)
+                .first()
+            ):
+                raise HTTPException(status_code=404, detail="Student not found")
+
+        if data.course_id is not None:
+            if (
+                not sql.query(models.Course)
+                .filter(models.Course.id == data.course_id)
+                .first()
+            ):
+                raise HTTPException(status_code=404, detail="Course not found")
+
+        if data.assigned_by is not None:
+            if (
+                not sql.query(models.User)
+                .filter(models.User.id == data.assigned_by)
+                .first()
+            ):
+                raise HTTPException(status_code=404, detail="Assigner not found")
+
+        for key, value in data.model_dump(exclude_unset=True).items():
+            if value is not None:
+                setattr(student_course, key, value)
+
+        sql.commit()
+        sql.refresh(student_course)
+        return StudentCourseResponse.model_validate(student_course)
+
+    except HTTPException as e:
+        raise e
+
+    except IntegrityError as e:
+        sql.rollback()
+        raise HTTPException(
+            status_code=409, detail="Error updating student course enrollment"
+        ) from e
+
+    except Exception as e:
+        sql.rollback()
+        raise HTTPException(status_code=500, detail="Internal server error") from e
 
 
 def get_student_course(sql: Session, student_course_id: int) -> StudentCourseResponse:
