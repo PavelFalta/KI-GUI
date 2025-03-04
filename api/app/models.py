@@ -1,27 +1,16 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Boolean
 from sqlalchemy.orm import relationship
 from app.database import Base
-from datetime import datetime
-
-
-class Status(Base):
-    __tablename__ = "statuses"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(50), unique=True, nullable=False)
-    description = Column(String(100), nullable=True)
-
-    tasks = relationship("Task", back_populates="status")
-    student_tasks = relationship("StudentTask", back_populates="status")
+from datetime import datetime, timezone
 
 
 class Role(Base):
     __tablename__ = "roles"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(50), unique=True, nullable=False)
-    description = Column(String(100), nullable=True)
-    is_active = Column(Boolean, nullable=False, default=True)
+    id = Column(Integer, primary_key=True, nullable=False)
+    name = Column(String(50), nullable=False)
+    description = Column(String(100))
+    is_active = Column(Boolean, nullable=False)
 
     users = relationship("User", back_populates="role")
 
@@ -29,70 +18,106 @@ class Role(Base):
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String(50), unique=True, nullable=False)
+    id = Column(Integer, primary_key=True, nullable=False)
+    username = Column(String(50), nullable=False)
     first_name = Column(String(50), nullable=False)
     last_name = Column(String(50), nullable=False)
-    email = Column(String(120), unique=True, nullable=False)
+    email = Column(String(120), nullable=False)
     password = Column(Text, nullable=False)
-    contact_number = Column(String(15), nullable=True)  # Unique?
-    created_at = Column(DateTime, nullable=False, default=datetime.now)
+    contact_number = Column(String(15))
+    created_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc))
     role_id = Column(Integer, ForeignKey("roles.id"), nullable=False)
-    is_active = Column(Boolean, nullable=False, default=True)
+    is_active = Column(Boolean, nullable=False)
 
     role = relationship("Role", back_populates="users")
-    tasks_created = relationship("Task", back_populates="creator")
-    assigned_tasks = relationship(
-        "StudentTask", foreign_keys="[StudentTask.student_id]", back_populates="student"
+    created_courses = relationship(
+        "Course", back_populates="creator", foreign_keys="Course.creator_id"
     )
-    assigned_by_tasks = relationship(
-        "StudentTask", foreign_keys="[StudentTask.assigned_by]", back_populates="assigner"
+    enrolled_courses = relationship("StudentCourse", back_populates="student")
+    assigned_courses = relationship(
+        "StudentCourse",
+        back_populates="assigner",
+        foreign_keys="StudentCourse.assigned_by",
     )
-
-
-class Task(Base):
-    __tablename__ = "tasks"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    title = Column(String(50), unique=True, nullable=False)
-    description = Column(String(100), nullable=True)
-    created_at = Column(DateTime, nullable=False, default=datetime.now)
-    category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
-    status_id = Column(Integer, ForeignKey("statuses.id"), nullable=False)
-    creator_id = Column(Integer, ForeignKey("users.id"), nullable=True)
-    is_active = Column(Boolean, nullable=False, default=True)
-
-    status = relationship("Status", back_populates="tasks")
-    creator = relationship("User", back_populates="tasks_created")
-    student_tasks = relationship("StudentTask", back_populates="task")
-    category = relationship("Category", back_populates="task")
-
-
-class StudentTask(Base):
-    __tablename__ = "students_tasks"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    student_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    task_id = Column(Integer, ForeignKey("tasks.id"), nullable=False)
-    assigned_by = Column(Integer, ForeignKey("users.id"), nullable=False)
-    status_id = Column(Integer, ForeignKey("statuses.id"), nullable=True)
-    enrollment_date = Column(DateTime, nullable=False, default=datetime.now)
-    completed_at = Column(DateTime, nullable=True)
-    feedback = Column(Text, nullable=True)
-    deadline = Column(DateTime, nullable=True)
-    is_active = Column(Boolean, nullable=False, default=True)
-
-    student = relationship("User", foreign_keys=[student_id], back_populates="assigned_tasks")
-    task = relationship("Task", back_populates="student_tasks")
-    assigner = relationship("User", foreign_keys=[assigned_by], back_populates="assigned_by_tasks")
-    status = relationship("Status", back_populates="student_tasks")
+    task_completions = relationship("Completion", back_populates="student")
 
 
 class Category(Base):
     __tablename__ = "categories"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(50), unique=True, nullable=False)
-    description = Column(String(100), nullable=True)
+    id = Column(Integer, primary_key=True, nullable=False)
+    name = Column(String(50), nullable=False)
+    description = Column(String(100))
+    is_active = Column(Boolean, nullable=False)
 
-    task = relationship("Task", back_populates="category")
+    courses = relationship("Course", back_populates="category")
+
+
+class Course(Base):
+    __tablename__ = "courses"
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    title = Column(String(50), nullable=False)
+    description = Column(String(100))
+    created_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc))
+    category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
+    creator_id = Column(Integer, ForeignKey("users.id"))
+    is_active = Column(Boolean, nullable=False)
+
+    category = relationship("Category", back_populates="courses")
+    creator = relationship(
+        "User", back_populates="created_courses", foreign_keys=[creator_id]
+    )
+    tasks = relationship("Task", back_populates="course")
+    enrolled_students = relationship("StudentCourse", back_populates="course")
+
+
+class Task(Base):
+    __tablename__ = "tasks"
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    parent_id = Column(Integer, ForeignKey("tasks.id"))
+    title = Column(String(50), nullable=False)
+    description = Column(String(100))
+    course_id = Column(Integer, ForeignKey("courses.id"))
+    is_active = Column(Boolean, nullable=False)
+
+    parent = relationship("Task", remote_side=[id], backref="subtasks")
+    course = relationship("Course", back_populates="tasks")
+    completions = relationship("Completion", back_populates="task")
+
+
+class StudentCourse(Base):
+    __tablename__ = "students_courses"
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    student_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    course_id = Column(Integer, ForeignKey("courses.id"), nullable=False)
+    assigned_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+    enrollment_date = Column(
+        DateTime, nullable=False, default=datetime.now(timezone.utc)
+    )
+    feedback = Column(Text)
+    deadline = Column(DateTime)
+    is_active = Column(Boolean, nullable=False)
+
+    student = relationship(
+        "User", foreign_keys=[student_id], back_populates="enrolled_courses"
+    )
+    course = relationship("Course", back_populates="enrolled_students")
+    assigner = relationship(
+        "User", foreign_keys=[assigned_by], back_populates="assigned_courses"
+    )
+
+
+class Completion(Base):
+    __tablename__ = "completions"
+
+    id = Column(Integer, primary_key=True, nullable=False)
+    task_id = Column(Integer, ForeignKey("tasks.id"), nullable=False)
+    student_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    completed_at = Column(DateTime, nullable=True)
+    is_active = Column(Boolean, nullable=False)
+
+    task = relationship("Task", back_populates="completions")
+    student = relationship("User", back_populates="task_completions")
