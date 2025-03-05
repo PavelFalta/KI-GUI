@@ -5,7 +5,7 @@ from datetime import datetime
 class CompletionBase(BaseModel):
     student_id: int
     task_id: int
-    is_active: bool = False
+    is_active: bool = True
     completed_at: datetime | None = None
     
 

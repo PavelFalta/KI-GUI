@@ -1,16 +1,16 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Boolean
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, Date, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-from app.database import Base
-from datetime import datetime, timezone
+
+Base = declarative_base()
 
 
 class Role(Base):
     __tablename__ = "roles"
 
-    id = Column(Integer, primary_key=True, nullable=False)
-    name = Column(String(50), nullable=False)
-    description = Column(String(100))
-    is_active = Column(Boolean, nullable=False)
+    role_id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False, unique=True)
+    description = Column(String, nullable=True)
 
     users = relationship("User", back_populates="role")
 
@@ -18,110 +18,85 @@ class Role(Base):
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, nullable=False)
-    username = Column(String(50), nullable=False)
-    first_name = Column(String(50), nullable=False)
-    last_name = Column(String(50), nullable=False)
-    email = Column(String(120), nullable=False)
-    password = Column(Text, nullable=False)
-    contact_number = Column(String(15))
-    created_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc))  # noqa: UP017
-    role_id = Column(Integer, ForeignKey("roles.id"), nullable=False)
-    is_active = Column(Boolean, nullable=False)
+    user_id = Column(Integer, primary_key=True, nullable=False)
+    username = Column(String, nullable=False, unique=True)
+    first_name = Column(String, nullable=False)
+    last_name = Column(String, nullable=False)
+    password_hash = Column(String, nullable=False)
+    email = Column(String, nullable=False, unique=True)
+    role_id = Column(Integer, ForeignKey("roles.role_id"), nullable=False)
+    is_active = Column(Boolean, nullable=False, default=True)
 
     role = relationship("Role", back_populates="users")
-    created_courses = relationship(
-        "Course", back_populates="creator", foreign_keys="[Course.creator_id]"
+    created_courses = relationship("Course", back_populates="teacher")
+    student_enrollments = relationship(
+        "Enrollment", foreign_keys="Enrollment.student_id", back_populates="student"
     )
-    enrolled_courses = relationship(
-        "StudentCourse",
-        back_populates="student",
-        foreign_keys="[StudentCourse.student_id]",
+    assigned_enrollments = relationship(
+        "Enrollment", foreign_keys="Enrollment.assigner_id", back_populates="assigner"
     )
-    assigned_courses = relationship(
-        "StudentCourse",
-        back_populates="assigner",
-        foreign_keys="[StudentCourse.assigned_by]",
-    )
-    task_completions = relationship("Completion", back_populates="student")
-
-
-class Category(Base):
-    __tablename__ = "categories"
-
-    id = Column(Integer, primary_key=True, nullable=False)
-    name = Column(String(50), nullable=False)
-    description = Column(String(100))
-    is_active = Column(Boolean, nullable=False)
-
-    courses = relationship("Course", back_populates="category")
 
 
 class Course(Base):
     __tablename__ = "courses"
 
-    id = Column(Integer, primary_key=True, nullable=False)
-    title = Column(String(50), nullable=False)
-    description = Column(String(100))
-    created_at = Column(DateTime, nullable=False, default=datetime.now(timezone.utc))  # noqa: UP017
-    category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
-    creator_id = Column(Integer, ForeignKey("users.id"))
-    is_active = Column(Boolean, nullable=False)
+    course_id = Column(Integer, primary_key=True, nullable=False)
+    teacher_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
+    title = Column(String, nullable=False, unique=True)
+    description = Column(String, nullable=True)
+    deadline_in_days = Column(Integer, nullable=True)
+    is_active = Column(Boolean, nullable=False, default=True)
 
-    category = relationship("Category", back_populates="courses")
-    creator = relationship(
-        "User", back_populates="created_courses", foreign_keys=[creator_id]
-    )
+    teacher = relationship("User", back_populates="created_courses")
     tasks = relationship("Task", back_populates="course")
-    enrolled_students = relationship("StudentCourse", back_populates="course")
+    enrollments = relationship("Enrollment", back_populates="course")
 
 
 class Task(Base):
     __tablename__ = "tasks"
 
-    id = Column(Integer, primary_key=True, nullable=False)
-    parent_id = Column(Integer, ForeignKey("tasks.id"))
-    title = Column(String(50), nullable=False)
-    description = Column(String(100))
-    course_id = Column(Integer, ForeignKey("courses.id"))
-    is_active = Column(Boolean, nullable=False)
+    task_id = Column(Integer, primary_key=True, nullable=False)
+    course_id = Column(Integer, ForeignKey("courses.course_id"), nullable=False)
+    title = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+    is_active = Column(Boolean, nullable=False, default=True)
 
-    parent = relationship("Task", remote_side=[id], backref="subtasks")
     course = relationship("Course", back_populates="tasks")
-    completions = relationship("Completion", back_populates="task")
+    task_completions = relationship("TaskCompletion", back_populates="task")
 
 
-class StudentCourse(Base):
-    __tablename__ = "students_courses"
+class Enrollment(Base):
+    __tablename__ = "enrollments"
 
-    id = Column(Integer, primary_key=True, nullable=False)
-    student_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    course_id = Column(Integer, ForeignKey("courses.id"), nullable=False)
-    assigned_by = Column(Integer, ForeignKey("users.id"), nullable=False)
-    enrollment_date = Column(
-        DateTime, nullable=False, default=datetime.now(timezone.utc)  # noqa: UP017
-    )
-    feedback = Column(Text)
-    deadline = Column(DateTime)
-    is_active = Column(Boolean, nullable=False)
+    enrollment_id = Column(Integer, primary_key=True, nullable=False)
+    student_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
+    assigner_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
+    course_id = Column(Integer, ForeignKey("courses.course_id"), nullable=False)
+    completed_at = Column(DateTime, nullable=True)
+    enrolled_at = Column(Date, nullable=False)
+    deadline = Column(Date, nullable=True)
+    is_active = Column(Boolean, nullable=False, default=True)
 
     student = relationship(
-        "User", foreign_keys=[student_id], back_populates="enrolled_courses"
+        "User", foreign_keys=[student_id], back_populates="student_enrollments"
     )
-    course = relationship("Course", back_populates="enrolled_students")
     assigner = relationship(
-        "User", foreign_keys=[assigned_by], back_populates="assigned_courses"
+        "User", foreign_keys=[assigner_id], back_populates="assigned_enrollments"
     )
+    course = relationship("Course", back_populates="enrollments")
+    task_completions = relationship("TaskCompletion", back_populates="enrollment")
 
 
-class Completion(Base):
-    __tablename__ = "completions"
+class TaskCompletion(Base):
+    __tablename__ = "task_completions"
 
-    id = Column(Integer, primary_key=True, nullable=False)
-    task_id = Column(Integer, ForeignKey("tasks.id"), nullable=False)
-    student_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    task_completion_id = Column(Integer, primary_key=True, nullable=False)
+    enrollment_id = Column(
+        Integer, ForeignKey("enrollments.enrollment_id"), nullable=False
+    )
+    task_id = Column(Integer, ForeignKey("tasks.task_id"), nullable=False)
     completed_at = Column(DateTime, nullable=True)
-    is_active = Column(Boolean, nullable=False)
+    is_active = Column(Boolean, nullable=False, default=True)
 
-    task = relationship("Task", back_populates="completions")
-    student = relationship("User", back_populates="task_completions")
+    enrollment = relationship("Enrollment", back_populates="task_completions")
+    task = relationship("Task", back_populates="task_completions")
