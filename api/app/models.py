@@ -42,6 +42,7 @@ class Course(Base):
 
     course_id = Column(Integer, primary_key=True, nullable=False)
     teacher_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
+    category_id = Column(Integer, ForeignKey("categories.category_id"), nullable=False)
     title = Column(String, nullable=False, unique=True)
     description = Column(String, nullable=True)
     deadline_in_days = Column(Integer, nullable=True)
@@ -50,6 +51,7 @@ class Course(Base):
     teacher = relationship("User", back_populates="created_courses")
     tasks = relationship("Task", back_populates="course")
     enrollments = relationship("Enrollment", back_populates="course")
+    category = relationship("CourseCategory", back_populates="courses")
 
 
 class Task(Base):
@@ -100,3 +102,14 @@ class TaskCompletion(Base):
 
     enrollment = relationship("Enrollment", back_populates="task_completions")
     task = relationship("Task", back_populates="task_completions")
+
+
+class Category(Base):
+    __tablename__ = "categories"
+
+    category_id = Column(Integer, primary_key=True, nullable=False)
+    name = Column(String, nullable=False, unique=True)
+    description = Column(String, nullable=True)
+    is_active = Column(Boolean, nullable=False, default=True)
+
+    courses = relationship("CourseCategory", back_populates="category")
