@@ -21,6 +21,7 @@ dependencies = [
     "pydantic[email] (>=2.10.6,<3.0.0)",
     "schemathesis (>=3.39.12,<4.0.0)",
     "gunicorn (>=23.0.0,<24.0.0)",
+    "pytest (>=8.3.5,<9.0.0)",
 ]
 
 

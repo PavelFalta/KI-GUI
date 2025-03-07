@@ -5,6 +5,7 @@ from app.src.users.schemas import (
     UserResponseTasksAndCourses,
     UserUpdate,
 )
+from app.utils import validate_int
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError, OperationalError
@@ -14,15 +15,14 @@ def create_user(sql: Session, data: UserCreate) -> UserResponse:
     try:
         new_user: models.User = models.User(**data.model_dump())
 
-        role: models.Role | None = sql.get(models.Role, new_user.role_id)
+        role: models.Role | None = sql.get(models.Role, validate_int(new_user.role_id))
         if role is None:
             raise HTTPException(status_code=404, detail="Role not found")
-
         sql.add(new_user)
         sql.commit()
         sql.refresh(new_user)
         return UserResponse.model_validate(new_user)
-
+    
     except HTTPException as e:
         raise e from e
 
@@ -31,6 +31,10 @@ def create_user(sql: Session, data: UserCreate) -> UserResponse:
 
     except OperationalError as e:
         raise HTTPException(status_code=500, detail=str(e.orig)) from e
+    
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail="Unexpected error") from e
 
 
 def get_users(sql: Session) -> list[UserResponse]:
@@ -41,6 +45,9 @@ def get_users(sql: Session) -> list[UserResponse]:
         if not users:
             raise HTTPException(status_code=404, detail="Users not found")
         return [UserResponse.model_validate(user) for user in users]
+
+    except HTTPException as e:
+        raise e
 
     except OperationalError as e:
         raise HTTPException(status_code=500, detail=str(e.orig)) from e
@@ -76,7 +83,7 @@ def update_user(sql: Session, user_id: int, data: UserUpdate) -> UserResponse:
             raise HTTPException(status_code=404, detail="User not found")
 
         if data.role_id is not None:
-            role: models.Role | None = sql.get(models.Role, data.role_id)
+            role: models.Role | None = sql.get(models.Role, validate_int(data.role_id))
             if role is None:
                 raise HTTPException(status_code=404, detail="Role not found")
 
