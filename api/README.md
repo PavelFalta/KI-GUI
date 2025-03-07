@@ -37,3 +37,6 @@
 - Testování pomocí Schemathesis  
 - Anotace  
 - Pytest
+
+
+## full db/api update
