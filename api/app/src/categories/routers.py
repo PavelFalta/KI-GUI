@@ -6,6 +6,7 @@ from app.src.categories.controllers import (
     get_categories,
     get_category,
     update_category,
+    delete_category,
 )
 from app.src.categories.schemas import CategoryCreate, CategoryResponse, CategoryUpdate
 from fastapi import APIRouter, Depends
@@ -45,3 +46,12 @@ def endp_get_category(
     sql: Annotated[Session, Depends(get_sql)], category_id: ID_PATH_ANNOTATION
 ) -> CategoryResponse:
     return get_category(sql, category_id)
+
+
+@router.delete(
+    "/{category_id}", summary="Delete a category", operation_id="deleteCategory"
+)
+def endp_delete_category(
+    category_id: ID_PATH_ANNOTATION, sql: Annotated[Session, Depends(get_sql)]
+) -> CategoryResponse:
+    return delete_category(sql, category_id)

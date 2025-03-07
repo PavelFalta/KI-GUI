@@ -7,9 +7,9 @@ from app import models
 
 def get_categories(sql: Session) -> list[CategoryResponse]:
     try:
-        return (
-            sql.query(models.Category).filter(models.Category.is_active == True).all()
-        )
+        categories: list[models.Category] = sql.query(models.Category).all()
+        return [CategoryResponse.model_validate(category) for category in categories]
+
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Internal server error") from e
@@ -17,11 +17,14 @@ def get_categories(sql: Session) -> list[CategoryResponse]:
 
 def create_category(sql: Session, data: CategoryCreate) -> CategoryResponse:
     try:
-        category = models.Category(**data.model_dump())
-        sql.add(category)
+        new_category = models.Category(**data.model_dump())
+
+        sql.add(new_category)
         sql.commit()
-        sql.refresh(category)
-        return category
+        sql.refresh(new_category)
+        return CategoryResponse.model_validate(
+            sql.get(models.Category, new_category.id)
+        )
 
     except IntegrityError as e:
         raise HTTPException(status_code=400, detail=str(e.orig)) from e
@@ -35,10 +38,8 @@ def update_category(
     sql: Session, category_id: int, data: CategoryUpdate
 ) -> CategoryResponse:
     try:
-        category: models.Category | None = (
-            sql.query(models.Category).filter(models.Category.id == category_id).first()
-        )
-        if not category:
+        category: models.Category | None = sql.get(models.Category, category_id)
+        if category is None:
             raise HTTPException(status_code=404, detail="Category not found")
 
         for key, value in data.model_dump(exclude_unset=True).items():
@@ -46,7 +47,7 @@ def update_category(
 
         sql.commit()
         sql.refresh(category)
-        return category
+        return CategoryResponse.model_validate(category)
 
     except IntegrityError as e:
         raise HTTPException(status_code=400, detail=str(e.orig)) from e
@@ -58,13 +59,26 @@ def update_category(
 
 def get_category(sql: Session, category_id: int) -> CategoryResponse:
     try:
-        category: models.Category | None = (
-            sql.query(models.Category).filter(models.Category.id == category_id).first()
-        )
-        if not category:
+        category: models.Category | None = sql.get(models.Category, category_id)
+        if category is None or not category.is_active:
             raise HTTPException(status_code=404, detail="Category not found")
 
-        return category
+        return CategoryResponse.model_validate(category)
+
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail="Internal server error") from e
+
+
+def delete_category(sql: Session, category_id: int):
+    try:
+        category: models.Category | None = sql.get(models.Category, category_id)
+        if category is None:
+            raise HTTPException(status_code=404, detail="Category not found")
+
+        category.is_active = False
+        sql.commit()
+        sql.refresh(category)
 
     except Exception as e:
         print(e)
