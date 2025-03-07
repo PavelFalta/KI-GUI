@@ -10,7 +10,7 @@ package-mode = false
 
 
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11,<4.0"
 dependencies = [
     "uvicorn (>=0.34.0,<0.35.0)",
     "fastapi[standard] (>=0.115.8,<0.116.0)",
@@ -19,6 +19,7 @@ dependencies = [
     "sqlalchemy (>=2.0.38,<3.0.0)",
     "sqlalchemy-schemadisplay (>=2.0,<3.0)",
     "pydantic[email] (>=2.10.6,<3.0.0)",
+    "schemathesis (>=3.39.12,<4.0.0)",
 ]
 
 
