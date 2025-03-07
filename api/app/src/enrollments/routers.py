@@ -5,8 +5,8 @@ from app.src.enrollments.controllers import (
     create_enrollment,
     delete_enrollment,
     get_enrollment,
+    get_enrollments,
     update_enrollment,
-    get_students_courses,
 )
 from app.src.enrollments.schemas import EnrollmentCreate, EnrollmentResponse, EnrollmentUpdate
 from fastapi import APIRouter, Depends
@@ -19,10 +19,10 @@ router = APIRouter(prefix="/enrollments", tags=["Enrollments"])
 
 
 @router.get("", summary="Get all student course enrollments", operation_id="getEnrollments")
-def endp_get_students_courses(
+def endp_get_enrollments(
     sql: Annotated[Session, Depends(get_sql)],
 ) -> list[EnrollmentResponse]:
-    return get_students_courses(sql=sql)
+    return get_enrollments(sql=sql)
 
 
 @router.post("", summary="Create a student course enrollment", operation_id="createEnrollment")
