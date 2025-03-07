@@ -59,7 +59,7 @@ def get_users(sql: Session) -> list[UserResponse]:
 
 def get_user(sql: Session, user_id: int) -> UserResponse:
     try:
-        user: models.User | None = sql.get(models.User, user_id)
+        user: models.User | None = sql.get(models.User, validate_int(user_id))
         if user is None or not user.is_active:
             raise HTTPException(status_code=404, detail="User not found")
 
@@ -78,7 +78,7 @@ def get_user(sql: Session, user_id: int) -> UserResponse:
 
 def update_user(sql: Session, user_id: int, data: UserUpdate) -> UserResponse:
     try:
-        user: models.User | None = sql.get(models.User, user_id)
+        user: models.User | None = sql.get(models.User, validate_int(user_id))
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")
 
@@ -112,7 +112,7 @@ def update_user(sql: Session, user_id: int, data: UserUpdate) -> UserResponse:
 def get_user_tasks_and_courses(
     sql: Session, user_id: int
 ) -> UserResponseTasksAndCourses:
-    user = sql.get(models.User, user_id)
+    user = sql.get(models.User, validate_int(user_id))
     if user is None or not user.is_active:
         raise HTTPException(status_code=404, detail="User not found")
     return UserResponseTasksAndCourses.model_validate(user)

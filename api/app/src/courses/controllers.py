@@ -47,7 +47,6 @@ def create_course(sql: Session, data: CourseCreate) -> CourseResponse:
 
 def update_course(sql: Session, data: CourseUpdate, course_id: int) -> CourseResponse:
     try:
-        print("aaaaaaaaaaaa")
         course: models.Course | None = sql.get(models.Course, validate_int(course_id))
         if course is None:
             raise HTTPException(status_code=404, detail="Course not found")
