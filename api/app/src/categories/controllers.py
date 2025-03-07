@@ -22,9 +22,7 @@ def create_category(sql: Session, data: CategoryCreate) -> CategoryResponse:
         sql.add(new_category)
         sql.commit()
         sql.refresh(new_category)
-        return CategoryResponse.model_validate(
-            new_category
-        )
+        return CategoryResponse.model_validate(new_category)
 
     except IntegrityError as e:
         raise HTTPException(status_code=400, detail=str(e.orig)) from e
@@ -49,6 +47,9 @@ def update_category(
         sql.refresh(category)
         return CategoryResponse.model_validate(category)
 
+    except HTTPException as e:
+        raise e
+
     except IntegrityError as e:
         raise HTTPException(status_code=400, detail=str(e.orig)) from e
 
@@ -64,7 +65,8 @@ def get_category(sql: Session, category_id: int) -> CategoryResponse:
             raise HTTPException(status_code=404, detail="Category not found")
 
         return CategoryResponse.model_validate(category)
-
+    except HTTPException as e:
+        raise e
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Internal server error") from e
@@ -79,6 +81,8 @@ def delete_category(sql: Session, category_id: int):
         category.is_active = False
         sql.commit()
         sql.refresh(category)
+    except HTTPException as e:
+        raise e
 
     except Exception as e:
         print(e)

@@ -49,9 +49,12 @@ def endp_get_category(
 
 
 @router.delete(
-    "/{category_id}", summary="Delete a category", operation_id="deleteCategory"
+    "/{category_id}",
+    summary="Delete a category",
+    operation_id="deleteCategory",
+    status_code=204,
 )
 def endp_delete_category(
     category_id: ID_PATH_ANNOTATION, sql: Annotated[Session, Depends(get_sql)]
-) -> CategoryResponse:
+):
     return delete_category(sql, category_id)
