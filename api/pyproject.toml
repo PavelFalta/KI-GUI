@@ -18,6 +18,7 @@ dependencies = [
     "pydantic-settings (>=2.8.0,<3.0.0)",
     "sqlalchemy (>=2.0.38,<3.0.0)",
     "sqlalchemy-schemadisplay (>=2.0,<3.0)",
+    "pydantic[email] (>=2.10.6,<3.0.0)",
 ]
 
 
