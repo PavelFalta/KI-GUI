@@ -55,12 +55,12 @@ def create_task(
 
 def update_task(sql: Session, data: TaskUpdate, task_id: int) -> TaskResponse:
     try:
-        task: models.Task | None = sql.get(models.Task, task_id)
+        task: models.Task | None = sql.get(models.Task, validate_int(task_id))
         if task is None or not task.is_active:
             raise HTTPException(status_code=404, detail="Task not found")
 
         if data.course_id is not None:
-            course: models.Course | None = sql.get(models.Course, data.course_id)
+            course: models.Course | None = sql.get(models.Course, validate_int(data.course_id))
             if course is None or not course.is_active:
                 raise HTTPException(status_code=404, detail="Course not found")
 
@@ -86,7 +86,7 @@ def update_task(sql: Session, data: TaskUpdate, task_id: int) -> TaskResponse:
 
 def get_task(sql: Session, task_id: int) -> TaskResponse:
     try:
-        task: models.Task | None = sql.get(models.Task, task_id)
+        task: models.Task | None = sql.get(models.Task, validate_int(task_id))
         if task is None or not task.is_active:
             raise HTTPException(status_code=404, detail="Task not found")
         return TaskResponse.model_validate(task)
@@ -100,7 +100,7 @@ def get_task(sql: Session, task_id: int) -> TaskResponse:
 
 def delete_task(sql: Session, task_id: int):
     try:
-        task: models.Task | None = sql.get(models.Task, task_id)
+        task: models.Task | None = sql.get(models.Task, validate_int(task_id))
         if task is None:
             raise HTTPException(status_code=404, detail="Task not found")
 
