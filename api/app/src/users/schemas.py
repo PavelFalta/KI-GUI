@@ -9,7 +9,7 @@ class UserBase(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
     first_name: str = Field(..., min_length=1, max_length=50)
     last_name: str = Field(..., min_length=1, max_length=50)
-    email: EmailStr = Field(..., min_length=5, max_length=50)
+    email: EmailStr | str = Field(..., min_length=5, max_length=50)
     is_active: bool = True
 
 
