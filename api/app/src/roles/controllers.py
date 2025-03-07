@@ -13,9 +13,12 @@ def get_roles(sql: Session) -> list[RoleResponse]:
             raise HTTPException(status_code=404, detail="Roles not found")
         return [RoleResponse.model_validate(role) for role in roles]
 
+    except HTTPException as e:
+        raise e
+
     except Exception as e:
         print(e)
-        raise HTTPException(status_code=500, detail="Internal server error") from e
+        raise HTTPException(status_code=500, detail="Unexpected error") from e
 
 
 def create_role(sql: Session, data: RoleCreate) -> RoleResponse:
@@ -32,6 +35,10 @@ def create_role(sql: Session, data: RoleCreate) -> RoleResponse:
 
     except OperationalError as e:
         raise HTTPException(status_code=500, detail=str(e.orig)) from e
+
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail="Unexpected error") from e
 
 
 def update_role(sql: Session, data: RoleUpdate, role_id: int) -> RoleResponse:
@@ -50,11 +57,11 @@ def update_role(sql: Session, data: RoleUpdate, role_id: int) -> RoleResponse:
         raise e
 
     except IntegrityError as e:
-        sql.rollback()
+        print(e)
         raise HTTPException(status_code=409, detail="Role already exists") from e
 
     except Exception as e:
-        sql.rollback()
+        print(e)
         raise HTTPException(status_code=500, detail="Internal server error") from e
 
 
@@ -69,7 +76,7 @@ def get_role(sql: Session, role_id: int) -> RoleResponse:
         raise e
 
     except Exception as e:
-        sql.rollback()
+        print(e)
         raise HTTPException(status_code=500, detail="Internal server error") from e
 
 
@@ -85,4 +92,5 @@ def delete_role(sql: Session, role_id: int):
         raise e
 
     except Exception as e:
+        print(e)
         raise HTTPException(status_code=500, detail="Internal server error") from e
