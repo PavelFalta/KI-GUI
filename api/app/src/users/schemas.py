@@ -15,7 +15,7 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     role_id: int
-    password: str = Field(..., min_length=6, max_length=50)
+    password_hash: str = Field(..., min_length=6, max_length=50)
 
 
 class UserResponse(UserBase):

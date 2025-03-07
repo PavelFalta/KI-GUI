@@ -20,6 +20,7 @@ dependencies = [
     "sqlalchemy-schemadisplay (>=2.0,<3.0)",
     "pydantic[email] (>=2.10.6,<3.0.0)",
     "schemathesis (>=3.39.12,<4.0.0)",
+    "gunicorn (>=23.0.0,<24.0.0)",
 ]
 
 
