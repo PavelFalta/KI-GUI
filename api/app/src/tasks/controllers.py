@@ -3,11 +3,14 @@ from sqlalchemy.orm import Session
 from app import models
 from app.src.tasks.schemas import TaskCreate, TaskResponse, TaskUpdate
 from sqlalchemy.exc import IntegrityError
+from app.utils import validate_int
 
 
 def get_tasks(sql: Session) -> list[TaskResponse]:
     try:
-        tasks: list[models.Task] = sql.query(models.Task).where(models.Task.is_active == True).all()
+        tasks: list[models.Task] = (
+            sql.query(models.Task).where(models.Task.is_active == True).all()
+        )
         if not tasks:
             raise HTTPException(status_code=404, detail="Task not found")
         return [TaskResponse.model_validate(task) for task in tasks]
@@ -24,13 +27,14 @@ def create_task(
     data: TaskCreate,
 ) -> TaskResponse:
     try:
-
         task_data = data.model_dump()
-        new_task: models.Task = models.Task(**task_data)  
-        course: models.Course | None = sql.get(models.Course, new_task.course_id)
+        new_task: models.Task = models.Task(**task_data)
+        course: models.Course | None = sql.get(
+            models.Course, validate_int(new_task.course_id)
+        )
         if course is None or not course.is_active:
             raise HTTPException(status_code=404, detail="Course not found")
-        
+
         sql.add(new_task)
         sql.commit()
         sql.refresh(new_task)
@@ -49,22 +53,17 @@ def create_task(
         raise HTTPException(status_code=500, detail="Internal server error") from e
 
 
-def update_task(
-    sql: Session, data: TaskUpdate, task_id: int
-) -> TaskResponse:
+def update_task(sql: Session, data: TaskUpdate, task_id: int) -> TaskResponse:
     try:
-        
-        task: models.Task | None = (
-            sql.get(models.Task, task_id)
-        )
+        task: models.Task | None = sql.get(models.Task, task_id)
         if task is None or not task.is_active:
             raise HTTPException(status_code=404, detail="Task not found")
-        
+
         if data.course_id is not None:
             course: models.Course | None = sql.get(models.Course, data.course_id)
             if course is None or not course.is_active:
                 raise HTTPException(status_code=404, detail="Course not found")
-            
+
         for var, value in vars(data).items():
             if value is not None:
                 setattr(task, var, value)
@@ -87,9 +86,7 @@ def update_task(
 
 def get_task(sql: Session, task_id: int) -> TaskResponse:
     try:
-        task: models.Task | None = (
-            sql.get(models.Task, task_id)
-        )
+        task: models.Task | None = sql.get(models.Task, task_id)
         if task is None or not task.is_active:
             raise HTTPException(status_code=404, detail="Task not found")
         return TaskResponse.model_validate(task)
@@ -103,10 +100,7 @@ def get_task(sql: Session, task_id: int) -> TaskResponse:
 
 def delete_task(sql: Session, task_id: int):
     try:
-       
-        task: models.Task | None = (
-            sql.get(models.Task, task_id)
-        )
+        task: models.Task | None = sql.get(models.Task, task_id)
         if task is None:
             raise HTTPException(status_code=404, detail="Task not found")
 
