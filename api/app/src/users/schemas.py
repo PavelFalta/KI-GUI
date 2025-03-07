@@ -30,7 +30,7 @@ class UserUpdate(BaseModel):
     username: str | None = Field(None, min_length=3, max_length=50)
     first_name: str | None = Field(None, min_length=1, max_length=50)
     last_name: str | None = Field(None, min_length=1, max_length=50)
-    email: EmailStr | None = Field(None, min_length=5, max_length=50)
+    email: EmailStr | str | None = Field(None, min_length=5, max_length=50)
     role_id: int | None = None
     is_active: bool | None = None
     password: str | None = Field(None, min_length=6, max_length=50)
