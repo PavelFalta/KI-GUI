@@ -21,7 +21,7 @@ def create_user(sql: Session, data: UserCreate) -> UserResponse:
         sql.add(new_user)
         sql.commit()
         sql.refresh(new_user)
-        return UserResponse.model_validate(sql.get(models.User, new_user.id))
+        return UserResponse.model_validate(new_user)
 
     except HTTPException as e:
         raise e from e

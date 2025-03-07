@@ -25,7 +25,7 @@ def create_role(sql: Session, data: RoleCreate) -> RoleResponse:
         sql.add(new_role)
         sql.commit()
         sql.refresh(new_role)
-        return RoleCreate.model_validate(sql.get(models.Role, new_role.id))
+        return RoleResponse.model_validate(new_role)
 
     except IntegrityError as e:
         raise HTTPException(status_code=409, detail=str(e.orig)) from e

@@ -102,7 +102,6 @@ def delete_course(sql: Session, course_id: int):
         course.is_active = False
         sql.commit()
         sql.refresh(course)
-        # return StatusResponse.model_validate(course)
 
     except HTTPException as e:
         raise e

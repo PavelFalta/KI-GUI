@@ -34,12 +34,7 @@ def create_task(
         sql.add(new_task)
         sql.commit()
         sql.refresh(new_task)
-
-        task_to_validate: models.Task = (
-            sql.get(models.Task, new_task.id)
-        )
-
-        return TaskResponse.model_validate(task_to_validate)
+        return TaskResponse.model_validate(new_task)
 
     except IntegrityError as e:
         sql.rollback()

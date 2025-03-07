@@ -43,6 +43,7 @@ def create_task_completion(
         sql.commit()
         sql.refresh(new_task_completion)
         return TaskCompletionResponse.model_validate(new_task_completion)
+
     except IntegrityError as e:
         sql.rollback()
         raise HTTPException(
@@ -77,6 +78,7 @@ def update_task_completion(
 
         for var, value in vars(data).items():
             setattr(task_completion, var, value)
+
         sql.commit()
         sql.refresh(task_completion)
         return TaskCompletionResponse.model_validate(task_completion)

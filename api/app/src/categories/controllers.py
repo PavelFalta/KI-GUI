@@ -23,7 +23,7 @@ def create_category(sql: Session, data: CategoryCreate) -> CategoryResponse:
         sql.commit()
         sql.refresh(new_category)
         return CategoryResponse.model_validate(
-            sql.get(models.Category, new_category.id)
+            new_category
         )
 
     except IntegrityError as e:
