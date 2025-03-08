@@ -1,5 +1,4 @@
-import { TouchableOpacity, TextInput, Text } from 'react-native';
-import ProgressBar from 'react-native-progress/Bar';
+import { TouchableOpacity, TextInput, Text, View } from 'react-native';
 import { classes, bar } from '@/constants/Styles';
 
 export function DocButton({ title, onPress }) {
@@ -21,15 +20,24 @@ export function DocInput({ placeholder, onChangeText, secureTextEntry = false })
   );
 }
 
-export function DocCourse({ title, progress }) {
-  return (
-    <TouchableOpacity style={[classes.container, classes.highlighted]}>
-      <Text style={classes.normal}>{title}</Text>
-      <ProgressBar
-        progress={progress}
-        color={bar.color}
-        height={bar.height}
+export function DocProgressBar({ progress }) {
+	return (
+    <View style={classes.progressBarContainer}>
+      <View
+        style={[ classes.progressBar, { width: `${progress * 100}%` }]}
       />
+    </View>
+	);
+}
+
+export function DocCourse({ title, progress, pendingApproval = false, finished = false }) {
+  return (
+    <TouchableOpacity style={[classes.container, classes.highlighted, classes.spread]}>
+      <Text style={classes.highlightedText}>{title}</Text>
+      <Text style={[classes.statusMessage, classes.normal]}>
+        {pendingApproval ? 'Pending approval' : finished ? 'Finished' : ''}
+      </Text>
+      <DocProgressBar progress={progress} />
     </TouchableOpacity>
   );
 }

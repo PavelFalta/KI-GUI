@@ -17,9 +17,8 @@ export default function CoursesScreen() {
   return (
     <View style={classes.page}>
       <Stack.Screen options={{ headerRight: () => <SettingsButton />}} />
-      <DocCourse title="Introductory course" progress={0.8} />
-      <DocCourse title="Advanced statistical methods" progress={1.0} />
-      <DocCourse title="Dummy" progress={0.2} />
+      <DocCourse title="Introduction" progress={0.8} pendingApproval/>
+      <DocCourse title="Advanced" progress={0.2}/>
     </View>
   );
 }
