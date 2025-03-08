@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "DocSchool Mobile",
-    "slug": "DocSchool Mobile",
+    "name": "docschool-mobile",
+    "slug": "docschool-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
