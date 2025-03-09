@@ -42,3 +42,26 @@ export function DocCourse({ title, progress, pendingApproval = false, finished =
     </TouchableOpacity>
   );
 }
+
+export function DocCourseDetail({ sampleTasks }) {
+
+  const currentTask = Object.keys(sampleTasks.currentTask)
+
+  return (
+    <>
+    <Text>{currentTask}</Text>
+    <Text>{sampleTasks.currentTask.task4}</Text>
+    <DocButton title="Submit for approval" onPress={() => {}}/>
+      
+    <Text>Completed Tasks:</Text>
+    {Object.entries(sampleTasks.completedTasks).map(([key, value]) => (
+      <Text>✔ {key}: {value}</Text>
+    ))}
+
+    <Text>Unfinished Tasks:</Text>
+    {Object.entries(sampleTasks.unfinishedTasks).map(([key, value]) => (
+      <Text>❌ {key}: {value}</Text>
+    ))}
+    </>
+  );
+}

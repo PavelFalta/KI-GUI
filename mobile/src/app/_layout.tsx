@@ -9,6 +9,7 @@ export default function RootLayout() {
       <Stack.Screen name="courses" options={{ title: 'Courses' }} />
       <Stack.Screen name="settings" options={{ title: 'Settings' }} />
       <Stack.Screen name="+not-found" options={{ title: 'Oops! Not Found' }} />
+      <Stack.Screen name="specific-course" options={{ title: 'Course details' }} />
     </Stack>
   );
 }
