@@ -1,4 +1,5 @@
 import { TouchableOpacity, TextInput, Text, View } from 'react-native';
+import { navigateWithHistory } from '@/constants/Functions';
 import { classes, bar } from '@/constants/Styles';
 
 export function DocButton({ title, onPress }) {
@@ -32,7 +33,7 @@ export function DocProgressBar({ progress }) {
 
 export function DocCourse({ title, progress, pendingApproval = false, finished = false }) {
   return (
-    <TouchableOpacity style={[classes.container, classes.highlighted, classes.spread]}>
+    <TouchableOpacity onPress={() => navigateWithHistory('specific-course')} style={[classes.container, classes.highlighted, classes.spread]}>
       <Text style={classes.highlightedText}>{title}</Text>
       <Text style={[classes.statusMessage, classes.normal]}>
         {pendingApproval ? 'Pending approval' : finished ? 'Finished' : ''}
