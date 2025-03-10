@@ -1,10 +1,10 @@
 import { Text, View } from 'react-native';
-import { classes } from '@/constants/Styles';
+import { viewStyle } from '@/constants/Common';
 
 export default function NotFoundScreen() {
   return (
-    <View style={classes.page}>
-      <Text style={classes.normal}>The requested page was not found.</Text>
+    <View style={viewStyle}>
+      <Text>The requested page was not found.</Text>
     </View>
   );
 }
