@@ -2,9 +2,13 @@ import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { viewStyle, navigateWithHistory } from '@/constants/Common';
 
 export default function WelcomeScreen() {
+  const handleWelcome = () => {
+    navigateWithHistory('login');
+  };
+
   return (
     <View style={viewStyle}>
-      <TouchableOpacity onPress={() => navigateWithHistory('login')} style={styles.button}>
+      <TouchableOpacity onPress={handleWelcome} style={styles.button}>
         <Text style={styles.buttonText}>Get started</Text>
       </TouchableOpacity>
     </View>

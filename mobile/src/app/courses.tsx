@@ -20,17 +20,21 @@ function SettingsButton() {
 }
 
 export default function CoursesScreen() {
+  const handleSelectCourse = () => {
+    navigateWithHistory('courseDetails');
+  };
+
   return (
     <View style={noViewStyle}>
       <ScrollView contentContainerStyle={scrollViewStyle}>
         <Stack.Screen options={{ headerRight: () => <SettingsButton />}} />
 
-        <TouchableOpacity onPress={() => navigateWithHistory('courseDetails')} style={styles.course}>
+        <TouchableOpacity onPress={handleSelectCourse} style={styles.course}>
           <Text style={styles.courseTitle}>Introduction</Text>
           <ProgressBar progress={0.8} />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navigateWithHistory('courseDetails')} style={styles.course}>
+        <TouchableOpacity onPress={handleSelectCourse} style={styles.course}>
           <Text style={styles.courseTitle}>Homework and Activities</Text>
           <Text style={styles.statusPending}>
             Pending
@@ -38,7 +42,7 @@ export default function CoursesScreen() {
           <ProgressBar progress={0.2} />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navigateWithHistory('courseDetails')} style={styles.course}>
+        <TouchableOpacity onPress={handleSelectCourse} style={styles.course}>
           <Text style={styles.courseTitle}>Advanced Statistical Methods</Text>
           <Text style={styles.statusFinished}>
             Finished

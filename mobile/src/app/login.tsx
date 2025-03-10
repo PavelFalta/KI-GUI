@@ -1,7 +1,14 @@
 import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { navigate, viewStyle } from '@/constants/Common';
-export default function LoginScreen() { const [username, setUsername] = useState(""); const [password, setPassword] = useState("");
+
+export default function LoginScreen() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = () => {
+    navigate('courses');
+  };
 
   return (
     <View style={viewStyle}>
@@ -16,7 +23,7 @@ export default function LoginScreen() { const [username, setUsername] = useState
         style = {styles.textInput}
         secureTextEntry
       />
-      <TouchableOpacity onPress={() => navigate('courses')} style={styles.button}>
+      <TouchableOpacity onPress={handleLogin} style={styles.button}>
         <Text style={styles.buttonText}>Continue</Text>
       </TouchableOpacity>
     </View>

@@ -2,13 +2,21 @@ import { Text, View, ScrollView, TouchableOpacity, StyleSheet } from 'react-nati
 import { navigate, noViewStyle, scrollViewStyle } from '@/constants/Common';
 
 export default function SettingsScreen() {
+  const handleChangePassword = () => {
+    return
+  };
+
+  const handleLogout = () => {
+    navigate('');
+  };
+
   return (
     <View style={noViewStyle}>
       <ScrollView contentContainerStyle={scrollViewStyle}>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity onPress={handleChangePassword} style={styles.button}>
           <Text>Change password</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigate('')} style={styles.button}>
+        <TouchableOpacity onPress={handleLogout} style={styles.button}>
           <Text style={styles.logoutText}>Log out</Text>
         </TouchableOpacity>
       </ScrollView>
