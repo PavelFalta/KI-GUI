@@ -7,3 +7,5 @@ services:
     volumes:
       - ./src:/usr/src/mobile
       - /usr/src/mobile/node_modules # Anonymous volume for modules
+    stdin_open: true
+    tty: true
