@@ -7,10 +7,11 @@ from app.src.enrollments.controllers import (
     get_enrollment,
     get_enrollments,
     update_enrollment,
+    get_task_completions_for_user,
 )
 from app.src.enrollments.schemas import EnrollmentCreate, EnrollmentResponse, EnrollmentUpdate
 from fastapi import APIRouter, Depends
-
+from app.src.enrollments.schemas import EnrollmentResponseTasks
 from sqlalchemy.orm import Session
 
 from app.database import get_sql
@@ -59,3 +60,9 @@ def endp_delete_enrollment(
     enrollment_id: ID_PATH_ANNOTATION, sql: Annotated[Session, Depends(get_sql)]
 ) -> None:
     return delete_enrollment(sql=sql, enrollment_id=enrollment_id)
+
+@router.get("/{user_id}/task_completion", summary="Get all task completions for a user", operation_id="getTaskCompletionsForUser")
+def endp_get_task_completions_for_user(
+    sql: Annotated[Session, Depends(get_sql)], user_id: ID_PATH_ANNOTATION
+) -> EnrollmentResponseTasks:
+    return get_task_completions_for_user(sql=sql, user_id=user_id)

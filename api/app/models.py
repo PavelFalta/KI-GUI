@@ -8,7 +8,7 @@ Base = declarative_base()
 class Role(Base):
     __tablename__ = "roles"
 
-    id = Column(Integer, primary_key=True)
+    role_id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False, unique=True)
     description = Column(String, nullable=True)
 
@@ -18,7 +18,7 @@ class Role(Base):
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, nullable=False)
+    user_id = Column(Integer, primary_key=True, nullable=False)
     username = Column(String, nullable=False, unique=True)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
@@ -40,7 +40,7 @@ class User(Base):
 class Course(Base):
     __tablename__ = "courses"
 
-    id = Column(Integer, primary_key=True, nullable=False)
+    course_id = Column(Integer, primary_key=True, nullable=False)
     teacher_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
     title = Column(String, nullable=False, unique=True)
@@ -57,7 +57,7 @@ class Course(Base):
 class Task(Base):
     __tablename__ = "tasks"
 
-    id = Column(Integer, primary_key=True, nullable=False)
+    task_id = Column(Integer, primary_key=True, nullable=False)
     course_id = Column(Integer, ForeignKey("courses.id"), nullable=False)
     title = Column(String, nullable=False)
     description = Column(String, nullable=True)
@@ -70,7 +70,7 @@ class Task(Base):
 class Enrollment(Base):
     __tablename__ = "enrollments"
 
-    id = Column(Integer, primary_key=True, nullable=False)
+    enrollment_id = Column(Integer, primary_key=True, nullable=False)
     student_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     assigner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     course_id = Column(Integer, ForeignKey("courses.id"), nullable=False)
@@ -92,7 +92,7 @@ class Enrollment(Base):
 class TaskCompletion(Base):
     __tablename__ = "task_completions"
 
-    id = Column(Integer, primary_key=True, nullable=False)
+    task_completion_id = Column(Integer, primary_key=True, nullable=False)
     enrollment_id = Column(
         Integer, ForeignKey("enrollments.id"), nullable=False
     )
@@ -107,7 +107,7 @@ class TaskCompletion(Base):
 class Category(Base):
     __tablename__ = "categories"
 
-    id = Column(Integer, primary_key=True, nullable=False)
+    category_id = Column(Integer, primary_key=True, nullable=False)
     name = Column(String, nullable=False, unique=True)
     description = Column(String, nullable=True)
     is_active = Column(Boolean, nullable=False, default=True)

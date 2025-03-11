@@ -19,7 +19,7 @@ class UserCreate(UserBase):
 
 
 class UserResponse(UserBase):
-    id: int
+    user_id: int
 
     role: RoleResponse
 

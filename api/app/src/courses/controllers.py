@@ -3,7 +3,6 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from app import models
 from app.src.courses.schemas import CourseCreate, CourseResponse, CourseUpdate
-
 from sqlalchemy.exc import IntegrityError
 
 

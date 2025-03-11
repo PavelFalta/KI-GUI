@@ -9,7 +9,7 @@ from app.utils import validate_int
 def get_tasks(sql: Session) -> list[TaskResponse]:
     try:
         tasks: list[models.Task] = (
-            sql.query(models.Task).where(models.Task.is_active == True).all()
+            sql.query(models.Task).filter(models.Task.is_active == True).all()
         )
         if not tasks:
             raise HTTPException(status_code=404, detail="Task not found")
@@ -19,7 +19,8 @@ def get_tasks(sql: Session) -> list[TaskResponse]:
         raise e
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Internal server error") from e
+        print(e)
+        raise HTTPException(status_code=500, detail="Internal server error: ") from e
 
 
 def create_task(

@@ -17,7 +17,7 @@ class CourseCreate(CourseBase):
 
 
 class CourseResponse(CourseBase):
-    id: int
+    course_id: int
     # category: CategoryResponse | None = None
     # teacher: UserResponse | None = None
 

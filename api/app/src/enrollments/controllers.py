@@ -6,6 +6,7 @@ from app.src.enrollments.schemas import (
     EnrollmentCreate,
     EnrollmentResponse,
     EnrollmentUpdate,
+    EnrollmentResponseTasks
 )
 
 from sqlalchemy.exc import IntegrityError
@@ -156,4 +157,45 @@ def delete_enrollment(sql: Session, enrollment_id: int):
 
     except Exception as e:
         sql.rollback()
+        raise HTTPException(status_code=500, detail="Internal server error") from e
+
+
+def get_task_completions_for_user(
+    sql: Session, user_id: int
+) -> list[EnrollmentResponseTasks]:
+    try:
+        enrollments: list[models.Enrollment] = (
+            sql.query(models.Enrollment)
+            .filter(models.Enrollment.student_id == user_id)
+            .join(models.TaskCompletion)
+            .all()
+        )
+        for enr in enrollments:
+            print(enr)
+
+        if not enrollments:
+            raise HTTPException(
+                status_code=404, detail="Student course enrollments not found"
+            )
+       
+        result = []
+        """for  enrollment in enrollments:
+            task_completions: list[models.TaskCompletion] = (
+                sql.query(models.TaskCompletion)
+                .filter(models.TaskCompletion.enrollment_id == enrollment.id)
+                .all()
+            )
+            completed_tasks = len(
+                [task_completion for task_completion in task_completions if task_completion.is_completed]
+            )
+            total_tasks = len(task_completions)
+            result.append(
+                EnrollmentResponseTasks.model_validate(enrollment, task_completions, completed_tasks, total_tasks)
+            ) """
+        return result
+
+    except HTTPException as e:
+        raise e
+
+    except Exception as e:
         raise HTTPException(status_code=500, detail="Internal server error") from e
