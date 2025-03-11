@@ -61,6 +61,7 @@ def endp_delete_enrollment(
 ) -> None:
     return delete_enrollment(sql=sql, enrollment_id=enrollment_id)
 
+
 @router.get("/{user_id}/task_completion", summary="Get all task completions for a user", operation_id="getTaskCompletionsForUser")
 def endp_get_task_completions_for_user(
     sql: Annotated[Session, Depends(get_sql)], user_id: ID_PATH_ANNOTATION
