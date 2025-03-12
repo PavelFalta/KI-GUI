@@ -1,117 +1,42 @@
-# Databázové modely
+# Checkpoints
 
-## Status
-
-| Název       | Typ        | Omezení                         |
-|------------|-----------|---------------------------------|
-| id         | Integer   | primární klíč, auto-increment  |
-| name       | String(50) | unikátní, not null             |
-| description | String(100) | nullable                     |
-
-**Vztahy:**  
-
-- `tasks` – relace k modelu **Task** (`back_populates="status"`)  
-- `student_tasks` – relace k modelu **StudentTask** (`back_populates="status"`)  
+## 1. Technický blok vysvětlování: FastAPI, Poetry
+- Simple Helloworld API call  
+- Dependency injection  
+- OpenAPI JSON, SwaggerUI  
+- **Poznámka**: [Needed - .vscode extensions]  
 
 ---
 
-## Role
+## 2. Pydantic + načtení .env
+- Ano, důležité :)
+---
 
-| Název       | Typ        | Omezení                         |
-|------------|-----------|---------------------------------|
-| id         | Integer   | primární klíč, auto-increment  |
-| name       | String(50) | unikátní, not null             |
-| description | String(100) | nullable                     |
-| is_active  | Boolean   | default=True, not null         |
-
-**Vztahy:**  
-
-- `users` – relace k modelu **User** (`back_populates="role"`)  
+## 3. Databáze a vysvětlení
+- Vysvětlení pomocí Use-case diagramu + ERD diagramu  
+- SQLAlchemy s Pydantic  
+- Modely DB  
+- Vytvoření všech schémat Pydantic  
+  - **Ukázka 2–3** + zbytek dopracování
 
 ---
 
-## User
-
-| Název       | Typ        | Omezení                                      |
-|------------|-----------|------------------------------------------------|
-| id         | Integer   | primární klíč, auto-increment                 |
-| username   | String(50) | unikátní, not null                            |
-| email      | String(120) | unikátní, not null                           |
-| password   | Text       | not null                                      |
-| created_at | DateTime  | default=datetime.now, not null                |
-| fk_role    | Integer   | ForeignKey("roles.id"), not null              |
-| is_active  | Boolean   | default=True, not null                        |
-
-**Vztahy:**  
-
-- `role` – relace k **Role** (`back_populates="users"`)  
-- `tasks_created` – relace k **Task** (`back_populates="creator"`)  
-- `assigned_tasks` – relace k **StudentTask** (`back_populates="student"`)  
-- `assigned_by_tasks` – relace k **StudentTask** (`back_populates="assigner"`)  
+## 4. File structure + Router only version
+- Možná diskuze, proč dělat v routerech nebo i v controllerech (čitelnost + testy)  
+- Předělání do controllerů
 
 ---
 
-## Task
-
-| Název       | Typ        | Omezení                                      |
-|------------|-----------|------------------------------------------------|
-| id         | Integer   | primární klíč, auto-increment                 |
-| title      | String(50) | unikátní, not null                            |
-| description | String(100) | nullable                                    |
-| created_at | DateTime  | default=datetime.now, not null                |
-| fk_status  | Integer   | ForeignKey("statuses.id"), not null           |
-| fk_creator | Integer   | ForeignKey("users.id"), nullable              |
-| is_active  | Boolean   | default=True, not null                        |
-
-**Vztahy:**  
-
-- `status` – relace k **Status** (`back_populates="tasks"`)  
-- `creator` – relace k **User** (`back_populates="tasks_created"`)  
-- `students` – relace k **StudentTask** (`back_populates="task"`)  
+## 5. Řešení Async vs. Workers (uvicorn)
+- Nutnost doučit se  
+- **!!! Dořešení s Beránkem – Potřeba konzultace !!!**
 
 ---
 
-## StudentTask
+## 6. Ukázka testů
+- Testování pomocí Schemathesis  
+- Anotace  
+- Pytest
 
-| Název       | Typ        | Omezení                                      |
-|------------|-----------|------------------------------------------------|
-| id         | Integer   | primární klíč, auto-increment                 |
-| fk_student | Integer   | ForeignKey("users.id"), not null              |
-| fk_task    | Integer   | ForeignKey("tasks.id"), not null              |
-| assigned_by | Integer  | ForeignKey("users.id"), not null              |
-| enrollment_date | DateTime | default=datetime.now, not null            |
-| completed_at | DateTime | nullable                                      |
-| is_active  | Boolean   | default=True, not null                        |
 
-**Vztahy:**  
-
-- `student` – relace k **User** (`back_populates="assigned_tasks"`)  
-- `task` – relace k **Task** (`back_populates="students"`)  
-- `assigner` – relace k **User** (`back_populates="assigned_by_tasks"`)  
-- `status` – relace k **Status** (`back_populates="student_tasks"`)  
-
-# API Endpoints
-
-| Endpoint                                  | Method(s)                |
-|-------------------------------------------|--------------------------|
-| /auth/register                            | POST                     |
-| /auth/login                               | POST                     |
-| /auth/logout                              | POST                     |
-| /users                                    | GET, POST                |
-| /users/{user_id}                          | GET, PUT/PATCH, DELETE   |
-| /users/{user_id}/tasks                    | GET, POST                |
-| /roles                                    | GET, POST                |
-| /roles/{role_id}                          | GET, PUT/PATCH, DELETE   |
-| /statuses                                 | GET, POST                |
-| /statuses/{id}                            | GET, PUT/PATCH, DELETE   |
-| /categories                               | GET, POST                |
-| /categories/{id}                          | GET, PUT/PATCH, DELETE   |
-| /tasks                                    | GET, POST                |
-| /tasks/{task_id}                          | GET, PUT/PATCH, DELETE   |
-| /student-tasks                            | GET, POST                |
-| /student-tasks/{student_task_id}          | GET, PUT/PATCH, DELETE   |
-| /bulk-assign                              | POST                     |
-| /bulk-approve                             | POST                     |
-| /student-tasks/{id}/certificate           | POST                     |
-
- - Certificate optional
+## full db/api update

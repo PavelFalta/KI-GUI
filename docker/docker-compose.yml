@@ -11,6 +11,7 @@ services:
       - ../api:/code
     env_file:
       - ../api/.env
+      
   frontend:
     build:
       context: ../frontend
