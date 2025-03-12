@@ -1,15 +1,30 @@
 import React from 'react';
 import CourseCard from './CourseCard';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 
-const Dashboard = ({ user, onLogout }) => {
+interface User {
+  username: string;
+}
 
-const coursesData = [
+interface DashboardProps {
+  user: User;
+  onLogout: () => void;
+}
+
+interface Course {
+  title: string;
+  totalTasks: number;
+  completedTasks: number;
+  pendingApproval: boolean;
+  taskLabels: string[];
+}
+
+const coursesData: Course[] = [
     { 
         title: 'Medical Ethics 101', 
         totalTasks: 10, 
         completedTasks: 8, 
-        pendingApproval: false ,
+        pendingApproval: false,
         taskLabels: [
             'Introduction to Medical Ethics',
             'The Hippocratic Oath',
@@ -43,7 +58,7 @@ const coursesData = [
         title: 'Clinical Diagnosis', 
         totalTasks: 12, 
         completedTasks: 5, 
-        pendingApproval: false ,
+        pendingApproval: false,
         taskLabels: [
             'Introduction to Clinical Diagnosis',
             'The Diagnostic Process',
@@ -61,8 +76,9 @@ const coursesData = [
     },
 ];
 
+const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
   // Animation variants
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: { 
       opacity: 1,
@@ -74,7 +90,7 @@ const coursesData = [
     }
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { y: 20, opacity: 0 },
     visible: { y: 0, opacity: 1, transition: { duration: 0.3 } }
   };

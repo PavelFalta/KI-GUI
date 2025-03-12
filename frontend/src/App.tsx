@@ -1,23 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, JSX } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 
-function App() {
-  const [user, setUser] = useState(null);
+interface User {
+  username: string;
+}
 
-  const handleLogin = (username) => {
+function App(): JSX.Element {
+  const [user, setUser] = useState<User | null>(null);
+
+  const handleLogin = (username: string): void => {
     // for demo
     setUser({ username });
   };
 
-  const handleLogout = () => {
+  const handleLogout = (): void => {
     setUser(null);
   };
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
-      <AnimatePresence exitBeforeEnter>
+      <AnimatePresence mode="wait">
         {user ? (
           <Dashboard key="dashboard" user={user} onLogout={handleLogout} />
         ) : (

@@ -1,14 +1,28 @@
-import React from 'react';
+import React, { JSX } from 'react';
 
-const CourseCard = ({ title, totalTasks, completedTasks, pendingApproval, taskLabels = [] }) => {
+interface CourseCardProps {
+  title: string;
+  totalTasks: number;
+  completedTasks: number;
+  pendingApproval: boolean;
+  taskLabels: string[];
+}
+
+const CourseCard: React.FC<CourseCardProps> = ({ 
+  title, 
+  totalTasks, 
+  completedTasks, 
+  pendingApproval, 
+  taskLabels = [] 
+}) => {
   const labels = taskLabels.length === totalTasks
     ? taskLabels
     : [...taskLabels, ...Array(Math.max(0, totalTasks - taskLabels.length)).fill("Additional Task")].slice(0, totalTasks);
 
   const progress = Math.round((completedTasks / totalTasks) * 100);
 
-  const renderTaskIndicators = () => {
-    const indicators = [];
+  const renderTaskIndicators = (): JSX.Element[] => {
+    const indicators: JSX.Element[] = [];
     for (let i = 0; i < totalTasks; i++) {
       let className = "h-3 w-3 rounded-full mx-1";
       
@@ -35,7 +49,7 @@ const CourseCard = ({ title, totalTasks, completedTasks, pendingApproval, taskLa
     return indicators;
   };
 
-  const renderTaskLabels = () => {
+  const renderTaskLabels = (): JSX.Element[] => {
     return labels.map((task, index) => {
       let className = "text-sm py-1";
       
