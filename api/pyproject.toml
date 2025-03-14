@@ -4,6 +4,8 @@ version = "0.1.0"
 description = ""
 authors = [
     {name = "marek.tremel",email = "tremelmarek@gmail.com"}
+    {name = "petr.kristen",email = "petrkristen8@gmail.com"}
+    {name = "radek.novak",email = "novakkradekk@gmail.com"}
 ]
 package-mode = false
 
