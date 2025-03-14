@@ -10,7 +10,7 @@ from app.src.enrollments.schemas import (
 )
 
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import func
+from sqlalchemy import func, select, and_
 
 
 def get_enrollments(sql: Session) -> list[EnrollmentResponse]:
@@ -162,39 +162,48 @@ def delete_enrollment(sql: Session, enrollment_id: int):
 
 
 def get_task_completions_for_user(
-    sql: Session, user_id: int
+    sql: Session, user_id: int, enrollment_id: int
 ) -> EnrollmentResponseTasks:
     try:
-        enrollment = (
-            sql.query(models.Enrollment)
-            .filter(models.Enrollment.student_id == user_id)
-            .first()
+        enrollment: models.Enrollment = (
+            sql.execute(select(models.Enrollment)
+            .where(models.Enrollment.student_id == user_id,
+                models.Enrollment.enrollment_id == enrollment_id,
+                models.Enrollment.is_active == True)                   
+            ).scalar_one()
         )
 
         if enrollment is None:
             raise HTTPException(
                 status_code=404, detail="Student course enrollments not found"
             )
-        total_tasks = (
-            sql.query(models.Task)
-            .filter(models.Task.course_id == enrollment.course_id)
-            .count()
-        )
-        completed_tasks = (
-            sql.query(models.TaskCompletion)
-            .filter(models.TaskCompletion.enrollment_id == enrollment.enrollment_id)
-            .filter(models.TaskCompletion.completed_at.isnot(None))
-            .count()
-        )
-        result = enrollment
-        result.total_tasks = total_tasks
-        result.completed_tasks = completed_tasks
         
-        return EnrollmentResponseTasks.model_validate(result)
+        result = sql.execute(
+            select(
+                func.count(models.Task.task_id).label('total_tasks'),
+                func.count(models.TaskCompletion.task_completion_id).label('completed_tasks')
+            )
+            .select_from(models.Task)
+            .outerjoin(
+                models.TaskCompletion, 
+                and_(models.TaskCompletion.task_id == models.Task.task_id,
+                    models.TaskCompletion.enrollment_id == enrollment.enrollment_id, 
+                    models.TaskCompletion.is_active == True)
+            )
+            .where(
+                models.Task.course_id == enrollment.course_id,
+                models.Task.is_active == True
+            )
+        ).one()
+
+        real_result = enrollment
+        real_result.total_tasks = result.total_tasks
+        real_result.completed_tasks = result.completed_tasks
+        
+        return EnrollmentResponseTasks.model_validate(real_result)
 
     except HTTPException as e:
         raise e
 
     except Exception as e:
-        print(e)
         raise HTTPException(status_code=500, detail="Internal server error") from e
