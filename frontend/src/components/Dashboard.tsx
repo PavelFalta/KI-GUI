@@ -1,144 +1,45 @@
-import React from 'react';
-import CourseCard from './CourseCard';
-import { motion, Variants } from 'framer-motion';
+import { useAuth } from '../contexts/AuthContext';
 
-interface User {
-  username: string;
-}
-
-interface DashboardProps {
-  user: User;
-  onLogout: () => void;
-}
-
-interface Course {
-  title: string;
-  totalTasks: number;
-  completedTasks: number;
-  pendingApproval: boolean;
-  taskLabels: string[];
-}
-
-const coursesData: Course[] = [
-    { 
-        title: 'Medical Ethics 101', 
-        totalTasks: 10, 
-        completedTasks: 8, 
-        pendingApproval: false,
-        taskLabels: [
-            'Introduction to Medical Ethics',
-            'The Hippocratic Oath',
-            'The Nuremberg Code',
-            'The Declaration of Geneva',
-            'The Belmont Report',
-            'The Helsinki Declaration',
-            'The Declaration of Istanbul',
-            'The Declaration of Taipei',
-            'The Declaration of Sydney',
-            'The Declaration of Montreal'
-        ]
-    },
-    { 
-        title: 'Anatomy & Physiology', 
-        totalTasks: 8, 
-        completedTasks: 8, 
-        pendingApproval: true,
-        taskLabels: [
-            'Introduction to Anatomy',
-            'The Skeletal System',
-            'The Muscular System',
-            'The Nervous System',
-            'The Cardiovascular System',
-            'The Respiratory System',
-            'The Digestive System',
-            'The Endocrine System'
-        ]
-    },
-    { 
-        title: 'Clinical Diagnosis', 
-        totalTasks: 12, 
-        completedTasks: 5, 
-        pendingApproval: false,
-        taskLabels: [
-            'Introduction to Clinical Diagnosis',
-            'The Diagnostic Process',
-            'The Medical History',
-            'The Physical Examination',
-            'The Differential Diagnosis',
-            'The Diagnostic Tests',
-            'The Diagnostic Imaging',
-            'The Laboratory Tests',
-            'The Biopsy',
-            'The Endoscopy',
-            'The Electrocardiogram',
-            'The Ultrasound'
-        ]
-    },
-];
-
-const Dashboard: React.FC<DashboardProps> = ({ user, onLogout }) => {
-  // Animation variants
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { 
-        duration: 0.5,
-        when: "beforeChildren",
-        staggerChildren: 0.2
-      }
-    }
-  };
-
-  const itemVariants: Variants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1, transition: { duration: 0.3 } }
-  };
+const Dashboard = () => {
+  const { user } = useAuth();
 
   return (
-    <motion.div 
-      className="min-h-screen bg-gray-100 dark:bg-gray-900"
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
-    >
-      <motion.header 
-        className="bg-white dark:bg-gray-800 shadow p-4 flex justify-between items-center"
-        variants={itemVariants}
-      >
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
-          Dashboard - Welcome, {user.username}
-        </h1>
-        <button
-          onClick={onLogout}
-          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition-colors duration-300"
-        >
-          Logout
-        </button>
-      </motion.header>
-      <motion.main 
-        className="container mx-auto p-6"
-        variants={itemVariants}
-      >
-        <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
-          Your Courses
-        </h2>
-        <motion.div 
-          className="grid gap-4 md:grid-cols-3"
-          variants={itemVariants}
-        >
-          {coursesData.map((course, index) => (
-            <motion.div
-              key={index}
-              variants={itemVariants}
-            >
-              <CourseCard {...course} />
-            </motion.div>
-          ))}
-        </motion.div>
-      </motion.main>
-    </motion.div>
+    <div className="bg-white shadow-md rounded-lg p-6">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">Dashboard</h2>
+      
+      {user && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <h3 className="text-lg font-medium text-blue-800 mb-2">Welcome, {user.first_name}!</h3>
+            <p className="text-blue-600">
+              You are logged in as <span className="font-semibold">{user.role.name}</span>
+            </p>
+          </div>
+          
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h3 className="text-lg font-medium text-gray-800 mb-2">Quick Stats</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white p-3 rounded shadow-sm">
+                <p className="text-sm text-gray-500">Courses</p>
+                <p className="text-xl font-bold">0</p>
+              </div>
+              <div className="bg-white p-3 rounded shadow-sm">
+                <p className="text-sm text-gray-500">Tasks</p>
+                <p className="text-xl font-bold">0</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-green-50 p-4 rounded-lg md:col-span-2">
+            <h3 className="text-lg font-medium text-green-800 mb-2">Recent Activity</h3>
+            <p className="text-green-600">
+              No recent activity to display.
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
-export default Dashboard;
+export default Dashboard; 
