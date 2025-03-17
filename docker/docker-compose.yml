@@ -1,0 +1,22 @@
+version: '3.9'
+
+services:
+  api:
+    build: ../api
+    container_name: api 
+    ports:
+      - "8000:8000"
+    restart: always
+    volumes:
+      - ../api:/code
+    env_file:
+      - ../api/.env
+      
+  frontend:
+    build: ../frontend
+    container_name: frontend
+    ports:
+      - "80:80"
+    restart: always
+    depends_on:
+      - api
