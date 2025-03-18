@@ -138,7 +138,7 @@ const ProfilePage = ({ viewMode = false }: ProfilePageProps) => {
       if (user && user.userId) {
         // Create update data with only the password
         const userUpdate: UserUpdate = {
-          password: newPassword
+          passwordHash: newPassword
         };
         
         // Call API to update user

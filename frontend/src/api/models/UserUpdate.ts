@@ -60,13 +60,14 @@ export interface UserUpdate {
      * @type {string}
      * @memberof UserUpdate
      */
-    password?: string | null;
+    passwordHash: string;
 }
 
 /**
  * Check if a given object implements the UserUpdate interface.
  */
 export function instanceOfUserUpdate(value: object): value is UserUpdate {
+    if (!('passwordHash' in value) || value['passwordHash'] === undefined) return false;
     return true;
 }
 
@@ -86,7 +87,7 @@ export function UserUpdateFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'email': json['email'] == null ? undefined : json['email'],
         'roleId': json['role_id'] == null ? undefined : json['role_id'],
         'isActive': json['is_active'] == null ? undefined : json['is_active'],
-        'password': json['password'] == null ? undefined : json['password'],
+        'passwordHash': json['password_hash'],
     };
 }
 
@@ -107,7 +108,7 @@ export function UserUpdateToJSONTyped(value?: UserUpdate | null, ignoreDiscrimin
         'email': value['email'],
         'role_id': value['roleId'],
         'is_active': value['isActive'],
-        'password': value['password'],
+        'password_hash': value['passwordHash'],
     };
 }
 
