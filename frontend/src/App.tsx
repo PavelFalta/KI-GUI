@@ -368,7 +368,7 @@ interface DashboardCardProps {
 
 const DashboardCard = ({ title, description, icon, linkTo }: DashboardCardProps) => {
   const navigate = useNavigate();
-  
+
   return (
     <motion.div 
       className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 relative"

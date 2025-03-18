@@ -19,7 +19,6 @@ const CourseManagement: React.FC = () => {
   const [description, setDescription] = useState('');
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [deadlineInDays, setDeadlineInDays] = useState<number>(30);
-  const [isActive, setIsActive] = useState(true);
   
   // State for the task form
   const [showTaskForm, setShowTaskForm] = useState(false);
@@ -39,7 +38,6 @@ const CourseManagement: React.FC = () => {
     setDescription('');
     setCategoryId(null);
     setDeadlineInDays(30);
-    setIsActive(true);
     setEditingCourse(null);
   };
   
@@ -55,7 +53,6 @@ const CourseManagement: React.FC = () => {
     setDescription(course.description || '');
     setCategoryId(course.categoryId);
     setDeadlineInDays(course.deadlineInDays || 30);
-    setIsActive(course.isActive || true);
     setEditingCourse(course);
     setShowCreateForm(true);
   };
@@ -104,7 +101,7 @@ const CourseManagement: React.FC = () => {
       categoryId,
       teacherId: user.userId,
       deadlineInDays,
-      isActive
+      isActive: true
     };
     
     try {
@@ -336,19 +333,6 @@ const CourseManagement: React.FC = () => {
                   className="py-2 px-3 block w-full border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
-              </div>
-              
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="active-checkbox"
-                  checked={isActive}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => setIsActive(e.target.checked)}
-                  className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                />
-                <label htmlFor="active-checkbox" className="ml-2 block text-sm text-gray-700">
-                  Active
-                </label>
               </div>
               
               <div className="pt-2 flex justify-end space-x-2">
