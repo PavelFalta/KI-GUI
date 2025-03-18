@@ -169,7 +169,7 @@ def get_task_completions_for_user(
             sql.execute(select(models.Enrollment)
             .where(models.Enrollment.student_id == user_id,
                 models.Enrollment.enrollment_id == enrollment_id,
-                models.Enrollment.is_active == True)                   
+                models.Enrollment.is_active == True)  # noqa: E712
             ).scalar_one()
         )
 
@@ -188,11 +188,11 @@ def get_task_completions_for_user(
                 models.TaskCompletion, 
                 and_(models.TaskCompletion.task_id == models.Task.task_id,
                     models.TaskCompletion.enrollment_id == enrollment.enrollment_id, 
-                    models.TaskCompletion.is_active == True)
+                    models.TaskCompletion.is_active == True)  # noqa: E712
             )
             .where(
                 models.Task.course_id == enrollment.course_id,
-                models.Task.is_active == True
+                models.Task.is_active == True  # noqa: E712
             )
         ).one()
 
