@@ -4,17 +4,19 @@ from app import models
 from app.src.roles.schemas import RoleCreate, RoleResponse, RoleUpdate
 
 from sqlalchemy.exc import IntegrityError, OperationalError
+from sqlalchemy.orm.query import Query
 
 
-def get_roles(sql: Session) -> list[RoleResponse]:
+def get_roles(sql: Session, status: str) -> list[RoleResponse]:
     try:
-        roles: list[models.Role] = sql.query(models.Role).all()
-        if not roles:
-            raise HTTPException(status_code=404, detail="Roles not found")
-        return [RoleResponse.model_validate(role) for role in roles]
+        roles: Query[models.Role] = sql.query(models.Role)
+        if status == "active":
+            roles = roles.filter(models.Course.is_active == True)
+        elif status == "inactive":
+            roles = roles.filter(models.Course.is_active == False)
 
-    except HTTPException as e:
-        raise e
+        roles = roles.all()
+        return [RoleResponse.model_validate(role) for role in roles]
 
     except Exception as e:
         print(e)

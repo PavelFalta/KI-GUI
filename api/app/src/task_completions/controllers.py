@@ -3,6 +3,7 @@ from app.utils import validate_int
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.query import Query
 
 from app.src.task_completions.schemas import (
     TaskCompletionCreate,
@@ -10,11 +11,20 @@ from app.src.task_completions.schemas import (
 )
 
 
-def get_task_completions(sql: Session) -> list[TaskCompletionResponse]:
+def get_task_completions(sql: Session, status: str) -> list[TaskCompletionResponse]:
     try:
-        task_completions: list[models.TaskCompletion] = sql.query(
+        task_completions: Query[models.TaskCompletion] = sql.query(
             models.TaskCompletion
-        ).all()
+        )
+        if status == "active":
+            task_completions = task_completions.filter(models.TaskCompletion.is_active)
+        elif status == "inactive":
+            task_completions = task_completions.filter(
+                models.TaskCompletion.is_active == False
+            )
+
+        task_completions = task_completions.all()
+
         return [
             TaskCompletionResponse.model_validate(task_completion)
             for task_completion in task_completions

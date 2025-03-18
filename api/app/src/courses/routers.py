@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from app.annotations import ID_PATH_ANNOTATION
+from app.annotations import ID_PATH_ANNOTATION, Status
 from app.src.courses.controllers import (
     create_course,
     delete_course,
@@ -20,9 +20,9 @@ router = APIRouter(prefix="/courses", tags=["Courses"])
 
 @router.get("", summary="Get all courses", operation_id="getCourses")
 def endp_get_courses(
-    sql: Annotated[Session, Depends(get_sql)],
+    sql: Annotated[Session, Depends(get_sql)], status: str = Status
 ) -> list[CourseResponse]:
-    return get_courses(sql=sql)
+    return get_courses(sql=sql, status=status)
 
 
 @router.post("", summary="Create a course", operation_id="createCourses")
@@ -48,7 +48,12 @@ def endp_get_course(
     return get_course(sql=sql, course_id=course_id)
 
 
-@router.delete("/{course_id}", summary="Delete a course", operation_id="deleteCourse", status_code=204)
+@router.delete(
+    "/{course_id}",
+    summary="Delete a course",
+    operation_id="deleteCourse",
+    status_code=204,
+)
 def endp_delete_course(
     course_id: ID_PATH_ANNOTATION, sql: Annotated[Session, Depends(get_sql)]
 ) -> None:

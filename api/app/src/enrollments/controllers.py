@@ -11,11 +11,19 @@ from app.src.enrollments.schemas import (
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import func, select, and_
+from sqlalchemy.orm.query import Query
 
 
-def get_enrollments(sql: Session) -> list[EnrollmentResponse]:
+def get_enrollments(sql: Session, status: str) -> list[EnrollmentResponse]:
     try:
-        enrollments: list[models.Enrollment] = sql.query(models.Enrollment).all()
+        enrollments: Query[models.Enrollment] = sql.query(models.Enrollment)
+        if status == "active":
+            enrollments = enrollments.filter(models.Enrollment.is_active == True)
+        elif status == "inactive":
+            enrollments = enrollments.filter(models.Enrollment.is_active == False)
+
+        enrollments = enrollments.all()
+
         return [
             EnrollmentResponse.model_validate(enrollment) for enrollment in enrollments
         ]

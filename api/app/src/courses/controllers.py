@@ -4,11 +4,18 @@ from sqlalchemy.orm import Session
 from app import models
 from app.src.courses.schemas import CourseCreate, CourseResponse, CourseUpdate
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.query import Query
 
 
-def get_courses(sql: Session) -> list[CourseResponse]:
+def get_courses(sql: Session, status: str) -> list[CourseResponse]:
     try:
-        courses: list[models.Course] = sql.query(models.Course).all()
+        courses: Query[models.Course] = sql.query(models.Course)
+        if status == "active":
+            courses = courses.filter(models.Course.is_active == True)
+        elif status == "inactive":
+            courses = courses.filter(models.Course.is_active == False)
+
+        courses = courses.all()
         return [CourseResponse.model_validate(course) for course in courses]
 
     except Exception as e:
@@ -19,11 +26,15 @@ def create_course(sql: Session, data: CourseCreate) -> CourseResponse:
     try:
         new_course: models.Course = models.Course(**data.model_dump())
 
-        category: models.Category | None = sql.get(models.Category, validate_int(data.category_id))
+        category: models.Category | None = sql.get(
+            models.Category, validate_int(data.category_id)
+        )
         if category is None or not category.is_active:
             raise HTTPException(status_code=404, detail="Category not found")
 
-        teacher: models.User | None = sql.get(models.User, validate_int(data.teacher_id))
+        teacher: models.User | None = sql.get(
+            models.User, validate_int(data.teacher_id)
+        )
         if teacher is None or not teacher.is_active:
             raise HTTPException(status_code=404, detail="Teacher not found")
 

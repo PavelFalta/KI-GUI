@@ -9,6 +9,7 @@ from app.utils import validate_int
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError, OperationalError
+from sqlalchemy.orm.query import Query
 
 
 def create_user(sql: Session, data: UserCreate) -> UserResponse:
@@ -22,7 +23,7 @@ def create_user(sql: Session, data: UserCreate) -> UserResponse:
         sql.commit()
         sql.refresh(new_user)
         return UserResponse.model_validate(new_user)
-    
+
     except HTTPException as e:
         raise e from e
 
@@ -31,23 +32,22 @@ def create_user(sql: Session, data: UserCreate) -> UserResponse:
 
     except OperationalError as e:
         raise HTTPException(status_code=500, detail=str(e.orig)) from e
-    
+
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Unexpected error") from e
 
 
-def get_users(sql: Session) -> list[UserResponse]:
+def get_users(sql: Session, status: str) -> list[UserResponse]:
     try:
-        users: list[models.User] = (
-            sql.query(models.User).where(models.User.is_active == True).all()
-        )
-        if not users:
-            raise HTTPException(status_code=404, detail="Users not found")
-        return [UserResponse.model_validate(user) for user in users]
+        users: Query[models.User] = sql.query(models.User)
+        if status == "active":
+            users = users.filter(models.User.is_active)
+        elif status == "inactive":
+            users = users.filter(models.User.is_active == False)
 
-    except HTTPException as e:
-        raise e
+        users = users.all()
+        return [UserResponse.model_validate(user) for user in users]
 
     except OperationalError as e:
         raise HTTPException(status_code=500, detail=str(e.orig)) from e

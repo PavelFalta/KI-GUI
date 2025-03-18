@@ -4,13 +4,18 @@ from app import models
 from app.src.tasks.schemas import TaskCreate, TaskResponse, TaskUpdate
 from sqlalchemy.exc import IntegrityError
 from app.utils import validate_int
+from sqlalchemy.orm.query import Query
 
 
-def get_tasks(sql: Session) -> list[TaskResponse]:
+def get_tasks(sql: Session, status: str) -> list[TaskResponse]:
     try:
-        tasks: list[models.Task] = (
-            sql.query(models.Task).filter(models.Task.is_active == True).all()
-        )
+        tasks: Query[models.Task] = sql.query(models.Task)
+        if status == "active":
+            tasks = tasks.filter(models.Task.is_active)
+        elif status == "inactive":
+            tasks = tasks.filter(models.Task.is_active == False)
+
+        tasks = tasks.all()
         return [TaskResponse.model_validate(task) for task in tasks]
 
     except Exception as e:
