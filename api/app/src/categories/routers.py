@@ -1,5 +1,5 @@
 from typing import Annotated
-from app.annotations import ID_PATH_ANNOTATION
+from app.annotations import ID_PATH_ANNOTATION, Status
 from app.database import get_sql
 from app.src.categories.controllers import (
     create_category,
@@ -18,9 +18,9 @@ router = APIRouter(prefix="/categories", tags=["Categories"])
 
 @router.get("", summary="Get all categories", operation_id="getCategories")
 def endp_get_categories(
-    sql: Annotated[Session, Depends(get_sql)],
+    sql: Annotated[Session, Depends(get_sql)], status: str = Status
 ) -> list[CategoryResponse]:
-    return get_categories(sql)
+    return get_categories(sql, status=status)
 
 
 @router.post("", summary="Create a category", operation_id="createCategories")
