@@ -109,9 +109,6 @@ const LoginPage = () => {
                   <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                     Password
                   </label>
-                  <a href="#" className="text-sm font-medium text-blue-600 hover:text-blue-500">
-                    Forgot password?
-                  </a>
                 </div>
                 <div className="relative rounded-md shadow-sm">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -164,9 +161,6 @@ const LoginPage = () => {
             <div className="text-center">
               <p className="text-sm text-gray-600 mb-2">
                 New to StudentHub? <Link to="/signup" className="font-medium text-blue-600 hover:text-blue-500">Create an account</Link>
-              </p>
-              <p className="text-xs text-gray-500">
-                Demo credentials: student1/password or student2/password
               </p>
             </div>
           </div>
