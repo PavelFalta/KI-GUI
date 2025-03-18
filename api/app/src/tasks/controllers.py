@@ -11,12 +11,7 @@ def get_tasks(sql: Session) -> list[TaskResponse]:
         tasks: list[models.Task] = (
             sql.query(models.Task).filter(models.Task.is_active == True).all()
         )
-        if not tasks:
-            raise HTTPException(status_code=404, detail="Task not found")
         return [TaskResponse.model_validate(task) for task in tasks]
-
-    except HTTPException as e:
-        raise e
 
     except Exception as e:
         print(e)
@@ -61,7 +56,9 @@ def update_task(sql: Session, data: TaskUpdate, task_id: int) -> TaskResponse:
             raise HTTPException(status_code=404, detail="Task not found")
 
         if data.course_id is not None:
-            course: models.Course | None = sql.get(models.Course, validate_int(data.course_id))
+            course: models.Course | None = sql.get(
+                models.Course, validate_int(data.course_id)
+            )
             if course is None or not course.is_active:
                 raise HTTPException(status_code=404, detail="Course not found")
 
