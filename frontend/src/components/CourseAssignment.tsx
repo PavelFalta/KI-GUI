@@ -166,7 +166,12 @@ const CourseAssignment: React.FC = () => {
             <div className="flex justify-end">
               <button
                 type="submit"
-                className="py-2 px-4 bg-blue-600 border border-transparent rounded-lg text-white hover:bg-blue-700 transition-colors"
+                className={`py-2 px-4 border rounded-lg transition-colors ${
+                  (!selectedCourse || !selectedStudent) 
+                    ? 'bg-gray-300 border-gray-300 text-gray-500 cursor-not-allowed' 
+                    : 'bg-blue-600 border-transparent text-white hover:bg-blue-700'
+                }`}
+                disabled={!selectedCourse || !selectedStudent}
               >
                 Assign Course
               </button>

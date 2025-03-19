@@ -208,6 +208,7 @@ const Tasks = () => {
 const Students = () => {
   // Using useStudents hook which fetches real student data
   const { students, loading, error, fetchStudents, assignTask } = useStudents();
+  const { user: currentUser } = useAuth(); // Get the current user
   const [assignModalOpen, setAssignModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<number | null>(null);
   const [taskTitle, setTaskTitle] = useState('');
@@ -290,12 +291,14 @@ const Students = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button 
-                        className="text-blue-600 hover:text-blue-900 mr-3"
-                        onClick={() => handleAssignCourse(student.userId)}
-                      >
-                        Assign Course
-                      </button>
+                      {currentUser && student.userId !== currentUser.userId && (
+                        <button 
+                          className="text-blue-600 hover:text-blue-900 mr-3"
+                          onClick={() => handleAssignCourse(student.userId)}
+                        >
+                          Assign Course
+                        </button>
+                      )}
                       <button 
                         className="text-indigo-600 hover:text-indigo-900"
                         onClick={() => navigate(`/profile/${student.userId}`)}

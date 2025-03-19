@@ -290,7 +290,7 @@ const ProfilePage = ({ viewMode = false }: ProfilePageProps) => {
                 Student
               </motion.span>
               
-              {viewMode && (
+              {viewMode && currentUser && user && currentUser.userId !== user.userId && (
                 <motion.button 
                   className="w-full py-2 px-4 border border-blue-500 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors"
                   onClick={() => {

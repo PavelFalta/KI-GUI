@@ -97,11 +97,14 @@ const LoginPage = () => {
                     required
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="py-3 pl-10 block w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                    className={`py-3 pl-10 block w-full border ${username.trim().length > 0 && username.trim().length < 3 ? 'border-red-300' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900`}
                     disabled={isSubmitting}
                     placeholder="Enter your username"
                   />
                 </div>
+                {username.trim().length > 0 && username.trim().length < 3 && (
+                  <p className="mt-1 text-sm text-red-600">Username must be at least 3 characters long</p>
+                )}
               </div>
 
               <div>
@@ -124,18 +127,25 @@ const LoginPage = () => {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="py-3 pl-10 block w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                    className={`py-3 pl-10 block w-full border ${password.trim().length > 0 && password.trim().length < 3 ? 'border-red-300' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900`}
                     disabled={isSubmitting}
                     placeholder="Enter your password"
                   />
                 </div>
+                {password.trim().length > 0 && password.trim().length < 3 && (
+                  <p className="mt-1 text-sm text-red-600">Password must be at least 3 characters long</p>
+                )}
               </div>
 
               <div>
                 <button
                   type="submit"
-                  className="group relative w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors text-base font-medium"
-                  disabled={isSubmitting}
+                  className={`group relative w-full flex justify-center py-3 px-4 border rounded-lg shadow-md transition-colors text-base font-medium ${
+                    isSubmitting || username.trim().length < 3 || password.trim().length < 3
+                      ? 'border-gray-300 bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'border-transparent text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+                  }`}
+                  disabled={isSubmitting || username.trim().length < 3 || password.trim().length < 3}
                 >
                   {isSubmitting ? (
                     <div className="flex items-center justify-center">
