@@ -251,94 +251,94 @@ const TaskManagement: React.FC = () => {
       <h1 className="text-3xl font-bold text-gray-900 mb-6">Task Management</h1>
       <p className="text-lg text-gray-700 mb-8">View, complete, and approve tasks</p>
       
-      {successMessage && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
-          {successMessage}
-        </div>
-      )}
+      <AnimatePresence>
+        {successMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 mb-6 flex items-center"
+          >
+            <div className="text-green-500 mr-3">
+              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <p className="text-green-700">{successMessage}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
       
-      {/* Tab Navigation */}
-      <div className="border-b mb-6">
-        <ul className="flex flex-wrap -mb-px">
-          <li className="mr-2">
-            <button
-              className={`inline-block py-2 px-4 ${
-                activeTab === 'assignedTasks'
-                  ? 'border-b-2 border-blue-500 text-blue-500'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-              onClick={() => setActiveTab('assignedTasks')}
-            >
-              Assigned Tasks
-              {notStartedTasks.length > 0 && (
-                <motion.span 
-                  className="ml-2 px-2 py-1 text-xs bg-blue-200 text-blue-800 rounded-full"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 500, damping: 20 }}
-                >
-                  {notStartedTasks.length}
-                </motion.span>
-              )}
-            </button>
-          </li>
-          <li className="mr-2">
-            <button
-              className={`inline-block py-2 px-4 ${
-                activeTab === 'pendingApprovals'
-                  ? 'border-b-2 border-blue-500 text-blue-500'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-              onClick={() => setActiveTab('pendingApprovals')}
-            >
-              Pending Approvals
-              {pendingTasks.length > 0 && (
-                <motion.span 
-                  className="ml-2 px-2 py-1 text-xs bg-yellow-200 text-yellow-800 rounded-full"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 500, damping: 20 }}
-                >
-                  {pendingTasks.length}
-                </motion.span>
-              )}
-            </button>
-          </li>
-          <li className="mr-2">
-            <button
-              className={`inline-block py-2 px-4 ${
-                activeTab === 'completedTasks'
-                  ? 'border-b-2 border-blue-500 text-blue-500'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-              onClick={() => setActiveTab('completedTasks')}
-            >
-              Completed Tasks
-              {completedTasks.length > 0 && (
-                <span className="ml-2 px-2 py-1 text-xs bg-green-200 text-green-800 rounded-full">
-                  {completedTasks.length}
-                </span>
-              )}
-            </button>
-          </li>
-          <li>
-            <button
-              className={`inline-block py-2 px-4 ${
-                activeTab === 'approvalsToReview'
-                  ? 'border-b-2 border-blue-500 text-blue-500'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-              onClick={() => setActiveTab('approvalsToReview')}
-            >
-              Approvals to Review
-              {assignerPendingApprovals.length > 0 && (
-                <span className="ml-2 px-2 py-1 text-xs bg-red-200 text-red-800 rounded-full">
-                  {assignerPendingApprovals.length}
-                </span>
-              )}
-            </button>
-          </li>
-        </ul>
+      {/* Modern Tab Navigation */}
+      <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg mb-8">
+        <button
+          className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all ${
+            activeTab === 'assignedTasks'
+              ? 'bg-white text-blue-600 shadow'
+              : 'text-gray-600 hover:text-gray-800'
+          }`}
+          onClick={() => setActiveTab('assignedTasks')}
+        >
+          <div className="flex items-center justify-center">
+            <span>Assigned Tasks</span>
+            {notStartedTasks.length > 0 && (
+              <span className="ml-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-800 rounded-full">
+                {notStartedTasks.length}
+              </span>
+            )}
+          </div>
+        </button>
+        <button
+          className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all ${
+            activeTab === 'pendingApprovals'
+              ? 'bg-white text-blue-600 shadow'
+              : 'text-gray-600 hover:text-gray-800'
+          }`}
+          onClick={() => setActiveTab('pendingApprovals')}
+        >
+          <div className="flex items-center justify-center">
+            <span>Pending</span>
+            {pendingTasks.length > 0 && (
+              <span className="ml-2 px-2 py-0.5 text-xs bg-yellow-100 text-yellow-800 rounded-full">
+                {pendingTasks.length}
+              </span>
+            )}
+          </div>
+        </button>
+        <button
+          className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all ${
+            activeTab === 'completedTasks'
+              ? 'bg-white text-blue-600 shadow'
+              : 'text-gray-600 hover:text-gray-800'
+          }`}
+          onClick={() => setActiveTab('completedTasks')}
+        >
+          <div className="flex items-center justify-center">
+            <span>Completed</span>
+            {completedTasks.length > 0 && (
+              <span className="ml-2 px-2 py-0.5 text-xs bg-green-100 text-green-800 rounded-full">
+                {completedTasks.length}
+              </span>
+            )}
+          </div>
+        </button>
+        <button
+          className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all ${
+            activeTab === 'approvalsToReview'
+              ? 'bg-white text-blue-600 shadow'
+              : 'text-gray-600 hover:text-gray-800'
+          }`}
+          onClick={() => setActiveTab('approvalsToReview')}
+        >
+          <div className="flex items-center justify-center">
+            <span>To Review</span>
+            {assignerPendingApprovals.length > 0 && (
+              <span className="ml-2 px-2 py-0.5 text-xs bg-red-100 text-red-800 rounded-full">
+                {assignerPendingApprovals.length}
+              </span>
+            )}
+          </div>
+        </button>
       </div>
       
       {/* Tab Content */}
@@ -350,75 +350,75 @@ const TaskManagement: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
+            className="space-y-6"
           >
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
-              <h3 className="text-lg font-semibold mb-4">Tasks Assigned to You</h3>
-              {notStartedTasks.length > 0 ? (
-                <div className="space-y-6">
-                  {/* Group tasks by course */}
-                  {(() => {
-                    // Group tasks by courseId
-                    const tasksByCoursesMap = notStartedTasks.reduce((acc, item) => {
-                      const courseId = item.course.courseId;
-                      if (!acc[courseId]) {
-                        acc[courseId] = {
-                          course: item.course,
-                          tasks: []
-                        };
-                      }
-                      acc[courseId].tasks.push(item);
-                      return acc;
-                    }, {} as Record<number, { course: CourseResponse, tasks: typeof notStartedTasks }>);
-
-                    // Convert the map to an array for rendering
-                    return Object.values(tasksByCoursesMap).map((group) => (
-                      <div key={group.course.courseId} className="bg-white rounded-xl shadow-sm overflow-hidden mb-4">
-                        <div className="bg-blue-50 px-6 py-4 border-b border-blue-100">
-                          <h2 className="text-xl font-semibold text-blue-800">{group.course.title}</h2>
-                        </div>
-                        <div className="divide-y divide-gray-100">
-                          {group.tasks.map((item, index) => (
-                            <div key={`${item.task.taskId}-${index}`} className="px-6 py-4 hover:bg-gray-50">
-                              <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                                <div>
-                                  <h3 className="text-lg font-medium text-gray-800">{item.task.title || "Untitled Task"}</h3>
-                                  <p className="mt-1 text-sm text-gray-600">{item.task.description || "No description provided."}</p>
-                                  <p className="mt-1 text-xs text-gray-500">Assigned by: {item.assignerName}</p>
-                                </div>
-                                <div className="mt-3 md:mt-0">
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleCompleteTask(item.task.taskId);
-                                    }}
-                                    disabled={completeTaskId === item.task.taskId}
-                                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-                                  >
-                                    {completeTaskId === item.task.taskId ? (
-                                      <>
-                                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Processing...
-                                      </>
-                                    ) : (
-                                      'Mark as Complete'
-                                    )}
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
+            {notStartedTasks.length === 0 ? (
+              <div className="bg-white rounded-xl shadow-sm p-6 text-center">
+                <div className="text-4xl mb-3">✨</div>
+                <h3 className="text-lg font-medium text-gray-900 mb-1">All Caught Up!</h3>
+                <p className="text-gray-500">You have no pending tasks to complete.</p>
+              </div>
+            ) : (
+              Object.values(
+                notStartedTasks.reduce((acc, item) => {
+                  const courseId = item.course.courseId;
+                  if (!acc[courseId]) {
+                    acc[courseId] = {
+                      course: item.course,
+                      tasks: []
+                    };
+                  }
+                  acc[courseId].tasks.push(item);
+                  return acc;
+                }, {} as Record<number, { course: CourseResponse; tasks: typeof notStartedTasks }>)
+              ).map((group) => (
+                <motion.div
+                  key={group.course.courseId}
+                  className="bg-white rounded-xl shadow-sm overflow-hidden"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div className="bg-gradient-to-r from-blue-50 to-blue-100 px-6 py-4 border-b border-blue-200">
+                    <h2 className="text-xl font-semibold text-blue-900">{group.course.title}</h2>
+                  </div>
+                  <div className="divide-y divide-gray-100">
+                    {group.tasks.map((item) => (
+                      <div key={item.task.taskId} className="p-6 hover:bg-gray-50 transition-colors">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                          <div className="flex-grow">
+                            <h3 className="text-lg font-medium text-gray-900">{item.task.title}</h3>
+                            {item.task.description && (
+                              <p className="mt-1 text-gray-600">{item.task.description}</p>
+                            )}
+                            <p className="mt-2 text-sm text-gray-500">Assigned by {item.assignerName}</p>
+                          </div>
+                          <div className="mt-4 md:mt-0 md:ml-6">
+                            <button
+                              onClick={() => handleCompleteTask(item.task.taskId)}
+                              disabled={completeTaskId === item.task.taskId}
+                              className="w-full md:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
+                            >
+                              {completeTaskId === item.task.taskId ? (
+                                <>
+                                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                  Processing...
+                                </>
+                              ) : (
+                                'Complete Task'
+                              )}
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    ));
-                  })()}
-                </div>
-              ) : (
-                <p className="text-gray-500">No active tasks assigned to you.</p>
-              )}
-            </div>
+                    ))}
+                  </div>
+                </motion.div>
+              ))
+            )}
           </motion.div>
         )}
         
@@ -429,36 +429,40 @@ const TaskManagement: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
+            className="space-y-6"
           >
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
-              <h3 className="text-lg font-semibold mb-4">Your Submitted Tasks Awaiting Approval</h3>
-              {pendingTasks.length > 0 ? (
-                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-                  <div className="divide-y divide-gray-200">
-                    {pendingTasks.map((item, index) => (
-                      <div key={`${item.task.taskId}-${index}`} className="px-6 py-4 hover:bg-gray-50">
-                        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                          <div>
-                            <h3 className="text-lg font-medium text-gray-800">{item.task.title || "Untitled Task"}</h3>
-                            <div className="mt-1 flex flex-col md:flex-row md:items-center text-sm text-gray-500">
-                              <span className="mr-2">Course: {item.course.title}</span>
-                            </div>
-                            <p className="mt-2 text-sm text-gray-600">{item.task.description || "No description provided."}</p>
-                          </div>
-                          <div className="mt-2 md:mt-0">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                              Pending Approval
+            {pendingTasks.length === 0 ? (
+              <div className="bg-white rounded-xl shadow-sm p-6 text-center">
+                <div className="text-4xl mb-3">🎯</div>
+                <h3 className="text-lg font-medium text-gray-900 mb-1">No Pending Approvals</h3>
+                <p className="text-gray-500">All your completed tasks have been approved.</p>
+              </div>
+            ) : (
+              <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div className="divide-y divide-gray-100">
+                  {pendingTasks.map((item) => (
+                    <div key={item.task.taskId} className="p-6 hover:bg-gray-50 transition-colors">
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                        <div className="flex-grow">
+                          <div className="flex items-center">
+                            <h3 className="text-lg font-medium text-gray-900">{item.task.title}</h3>
+                            <span className="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                              Awaiting Approval
                             </span>
                           </div>
+                          {item.task.description && (
+                            <p className="mt-1 text-gray-600">{item.task.description}</p>
+                          )}
+                          <p className="mt-2 text-sm text-gray-500">
+                            From course: {item.course.title}
+                          </p>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
-              ) : (
-                <p className="text-gray-500">No tasks pending approval.</p>
-              )}
-            </div>
+              </div>
+            )}
           </motion.div>
         )}
         
@@ -469,50 +473,53 @@ const TaskManagement: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
+            className="space-y-6"
           >
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
-              <h3 className="text-lg font-semibold mb-4">Your Completed Tasks</h3>
-              {completedTasks.length > 0 ? (
-                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-                  <div className="divide-y divide-gray-200">
-                    {completedTasks.map((item, index) => {
-                      // Find the task completion to get the completion date
-                      const completion = taskCompletions.find(tc => 
-                        tc.taskId === item.task.taskId && 
-                        tc.isActive === true
-                      );
-                      
-                      return (
-                        <div key={`${item.task.taskId}-${index}`} className="px-6 py-4 hover:bg-gray-50">
-                          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                            <div>
-                              <h3 className="text-lg font-medium text-gray-800">{item.task.title || "Untitled Task"}</h3>
-                              <div className="mt-1 flex flex-col md:flex-row md:items-center text-sm text-gray-500">
-                                <span className="mr-2">Course: {item.course.title}</span>
-                                {completion?.completedAt && (
-                                  <>
-                                    <span className="mr-2 text-gray-400">•</span>
-                                    <span>Completed: {new Date(completion.completedAt).toLocaleDateString()}</span>
-                                  </>
-                                )}
-                              </div>
-                              <p className="mt-2 text-sm text-gray-600">{item.task.description || "No description provided."}</p>
-                            </div>
-                            <div className="mt-2 md:mt-0">
-                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            {completedTasks.length === 0 ? (
+              <div className="bg-white rounded-xl shadow-sm p-6 text-center">
+                <div className="text-4xl mb-3">📝</div>
+                <h3 className="text-lg font-medium text-gray-900 mb-1">No Completed Tasks Yet</h3>
+                <p className="text-gray-500">Complete some tasks to see them here.</p>
+              </div>
+            ) : (
+              <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div className="divide-y divide-gray-100">
+                  {completedTasks.map((item) => {
+                    const completion = taskCompletions.find(tc => 
+                      tc.taskId === item.task.taskId && 
+                      tc.isActive === true
+                    );
+                    
+                    return (
+                      <div key={item.task.taskId} className="p-6 hover:bg-gray-50 transition-colors">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                          <div className="flex-grow">
+                            <div className="flex items-center">
+                              <h3 className="text-lg font-medium text-gray-900">{item.task.title}</h3>
+                              <span className="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                 Completed
                               </span>
                             </div>
+                            {item.task.description && (
+                              <p className="mt-1 text-gray-600">{item.task.description}</p>
+                            )}
+                            <div className="mt-2 flex flex-wrap gap-2 text-sm text-gray-500">
+                              <span>Course: {item.course.title}</span>
+                              {completion?.completedAt && (
+                                <>
+                                  <span>•</span>
+                                  <span>Completed on {new Date(completion.completedAt).toLocaleDateString()}</span>
+                                </>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              ) : (
-                <p className="text-gray-500">No completed tasks yet.</p>
-              )}
-            </div>
+              </div>
+            )}
           </motion.div>
         )}
         
@@ -523,50 +530,64 @@ const TaskManagement: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
+            className="space-y-6"
           >
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-              <h3 className="text-lg font-semibold mb-4">Tasks Awaiting Your Approval</h3>
-              {assignerPendingApprovals.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full bg-white">
-                    <thead>
-                      <tr className="bg-gray-100">
-                        <th className="py-2 px-4 text-left">Student</th>
-                        <th className="py-2 px-4 text-left">Task</th>
-                        <th className="py-2 px-4 text-left">Course</th>
-                        <th className="py-2 px-4 text-left">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {assignerPendingApprovals.map((approval, index) => {
-                        const task = tasks.find(t => t.taskId === approval.taskId);
-                        const enrollment = enrollments.find(e => e.enrollmentId === approval.enrollmentId);
-                        const course = enrollment ? courses.find(c => c.courseId === enrollment.courseId) : null;
-                        
-                        return (
-                          <tr key={approval.taskCompletionId} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                            <td className="py-2 px-4">{approval.studentName || 'Unknown Student'}</td>
-                            <td className="py-2 px-4">{task?.title || 'Unknown Task'}</td>
-                            <td className="py-2 px-4">{course?.title || 'Unknown Course'}</td>
-                            <td className="py-2 px-4">
-                              <button
-                                onClick={() => handleApproveTask(approval.taskCompletionId)}
-                                className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded text-sm"
-                                disabled={loadingTaskCompletions}
-                              >
-                                {loadingTaskCompletions ? 'Processing...' : 'Approve'}
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+            {assignerPendingApprovals.length === 0 ? (
+              <div className="bg-white rounded-xl shadow-sm p-6 text-center">
+                <div className="text-4xl mb-3">👍</div>
+                <h3 className="text-lg font-medium text-gray-900 mb-1">No Tasks to Review</h3>
+                <p className="text-gray-500">You have no pending tasks to approve.</p>
+              </div>
+            ) : (
+              <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                <div className="divide-y divide-gray-100">
+                  {assignerPendingApprovals.map((approval) => {
+                    const task = tasks.find(t => t.taskId === approval.taskId);
+                    const enrollment = enrollments.find(e => e.enrollmentId === approval.enrollmentId);
+                    const course = enrollment ? courses.find(c => c.courseId === enrollment.courseId) : null;
+                    
+                    return (
+                      <div key={approval.taskCompletionId} className="p-6 hover:bg-gray-50 transition-colors">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                          <div className="flex-grow">
+                            <div className="flex items-center">
+                              <h3 className="text-lg font-medium text-gray-900">{task?.title}</h3>
+                              <span className="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                Needs Review
+                              </span>
+                            </div>
+                            <div className="mt-2 flex flex-wrap gap-2 text-sm text-gray-500">
+                              <span>Student: {approval.studentName}</span>
+                              <span>•</span>
+                              <span>Course: {course?.title}</span>
+                            </div>
+                          </div>
+                          <div className="mt-4 md:mt-0 md:ml-6">
+                            <button
+                              onClick={() => handleApproveTask(approval.taskCompletionId)}
+                              disabled={loadingTaskCompletions}
+                              className="w-full md:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 transition-colors"
+                            >
+                              {loadingTaskCompletions ? (
+                                <>
+                                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                  Processing...
+                                </>
+                              ) : (
+                                'Approve Task'
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              ) : (
-                <p className="text-gray-500">No tasks waiting for your approval.</p>
-              )}
-            </div>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

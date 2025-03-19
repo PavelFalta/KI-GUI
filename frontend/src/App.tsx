@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Routes, Route, Navigate, useLocation, useNavigate, Link } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import LoadingSpinner from './components/ui/LoadingSpinner';
@@ -204,38 +204,82 @@ const Tasks = () => {
   );
 };
 
-// Updated Students component to use real API data
+// Updated Students component to use modern square tile layout
 const Students = () => {
-  // Using useStudents hook which fetches real student data
-  const { students, loading, error, fetchStudents, assignTask } = useStudents();
-  const { user: currentUser } = useAuth(); // Get the current user
-  const [assignModalOpen, setAssignModalOpen] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<number | null>(null);
-  const [taskTitle, setTaskTitle] = useState('');
+  const { students, loading, error, fetchStudents } = useStudents();
+  const { user: currentUser } = useAuth();
   const navigate = useNavigate();
+  
+  // State for search functionality
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const handleAssignCourse = (studentId: number) => {
-    const student = students.find(s => s.userId === studentId);
-    navigate('/course-assignment', { 
-      state: { 
-        preSelectedStudentId: studentId,
-        preSelectedStudentName: student ? `${student.firstName} ${student.lastName}` : 'Unknown Student'
-      } 
+  // Filter students based on search query
+  const filteredStudents = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return students.filter(student => student.isActive !== false);
+    }
+    
+    const query = searchQuery.toLowerCase().trim();
+    return students.filter(student => {
+      return (
+        student.isActive !== false &&
+        (
+          `${student.firstName} ${student.lastName}`.toLowerCase().includes(query) ||
+          student.email.toLowerCase().includes(query) ||
+          (student.username && student.username.toLowerCase().includes(query))
+        )
+      );
     });
-  };
+  }, [students, searchQuery]);
 
-  const submitTaskAssignment = async () => {
-    if (selectedStudent && taskTitle.trim()) {
-      await assignTask(selectedStudent, taskTitle);
-      setAssignModalOpen(false);
+  // Handle key press anywhere on the page
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.target instanceof HTMLInputElement || 
+        e.target instanceof HTMLTextAreaElement ||
+        e.target instanceof HTMLSelectElement ||
+        e.metaKey ||
+        e.ctrlKey ||
+        e.altKey
+      ) {
+        return;
+      }
+      
+      if (/^[a-zA-Z0-9]$/.test(e.key)) {
+        setIsSearchVisible(true);
+        if (searchInputRef.current) {
+          searchInputRef.current.focus();
+        }
+      }
+      
+      if (e.key === 'Escape' && isSearchVisible) {
+        setIsSearchVisible(false);
+        setSearchQuery('');
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isSearchVisible]);
+
+  // Handle search query changes
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    
+    if (value === '') {
+      setIsSearchVisible(false);
+    } else {
+      setIsSearchVisible(true);
     }
   };
 
-  // Only show active students
-  const activeStudents = students.filter(student => student.isActive !== false);
-
-  // Show loading while fetching students
-  if (loading && activeStudents.length === 0) {
+  if (loading && students.length === 0) {
     return (
       <div className="flex justify-center items-center h-64">
         <LoadingSpinner size="lg" />
@@ -246,117 +290,84 @@ const Students = () => {
   return (
     <div className="animate-fade-in">
       <h1 className="text-3xl font-bold text-gray-900 mb-6">Students</h1>
-      <p className="text-lg text-gray-700 mb-8">View and manage connections with other students</p>
+      <p className="text-lg text-gray-700 mb-6">View and manage connections with other students</p>
       
-      {/* Show error if API fetch failed */}
+      {/* Search Tray */}
+      <AnimatePresence>
+        {isSearchVisible && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+            className="mb-6 sticky top-4 z-10"
+          >
+            <div className="bg-white rounded-xl shadow-md p-3 flex items-center">
+              <div className="text-gray-400 mr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={searchQuery}
+                onChange={handleSearchChange}
+                className="flex-1 border-none focus:ring-0 py-2 text-gray-700 placeholder-gray-400 text-lg bg-transparent"
+                placeholder="Search students by name, email, or username..."
+                autoFocus
+              />
+            </div>
+            {searchQuery && filteredStudents.length === 0 && (
+              <div className="bg-blue-50 p-4 rounded-lg mt-4 text-center">
+                <p className="text-blue-700">No students found matching "{searchQuery}"</p>
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {error && (
         <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6" role="alert">
           <p className="text-red-700">{error}</p>
         </div>
       )}
 
-      {/* Display students from API */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          {activeStudents.length > 0 ? (
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {activeStudents.map((student) => (
-                  <tr key={student.userId} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-semibold">
-                          {student.firstName?.[0] || '?'}{student.lastName?.[0] || '?'}
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{student.firstName} {student.lastName}</div>
-                          <div className="text-sm text-gray-500">@{student.username}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {student.email}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        Active
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      {currentUser && student.userId !== currentUser.userId && (
-                        <button 
-                          className="text-blue-600 hover:text-blue-900 mr-3"
-                          onClick={() => handleAssignCourse(student.userId)}
-                        >
-                          Assign Course
-                        </button>
-                      )}
-                      <button 
-                        className="text-indigo-600 hover:text-indigo-900"
-                        onClick={() => navigate(`/profile/${student.userId}`)}
-                      >
-                        View Profile
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : !loading && (
-            <div className="text-center py-10">
-              <p className="text-gray-500">No students found.</p>
+      {/* Students Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+        {filteredStudents.map(student => (
+          <motion.div 
+            key={student.userId}
+            className="aspect-square cursor-pointer"
+            whileHover={{ scale: 1.05 }}
+            onClick={() => navigate(`/profile/${student.userId}`)}
+          >
+            <div className="w-full h-full bg-white rounded-2xl shadow-sm overflow-hidden relative group">
+              {/* Large Profile Picture */}
+              <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center">
+                <div className="text-4xl font-bold text-blue-800">
+                  {student.firstName?.[0]}{student.lastName?.[0]}
+                </div>
+              </div>
+              
+              {/* Overlay with name on hover */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                <div className="text-white">
+                  <h3 className="font-semibold text-lg leading-tight">
+                    {student.firstName} {student.lastName}
+                  </h3>
+                  <p className="text-sm text-white/80">@{student.username}</p>
+                </div>
+              </div>
+              
+              {/* Active Status Indicator */}
+              <div className="absolute top-2 right-2">
+                <span className="h-3 w-3 rounded-full bg-green-500 ring-2 ring-white block"></span>
+              </div>
             </div>
-          )}
-        </div>
+          </motion.div>
+        ))}
       </div>
-
-      {/* Task Assignment Modal */}
-      {assignModalOpen && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Assign New Task</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Task Title
-                </label>
-                <input
-                  type="text"
-                  value={taskTitle}
-                  onChange={(e) => setTaskTitle(e.target.value)}
-                  className="py-2 px-3 block w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter task title"
-                />
-              </div>
-              <div className="pt-2 flex justify-end space-x-2">
-                <button
-                  type="button"
-                  onClick={() => setAssignModalOpen(false)}
-                  className="py-2 px-4 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={submitTaskAssignment}
-                  disabled={!taskTitle.trim()}
-                  className="py-2 px-4 bg-blue-600 border border-transparent rounded-lg text-white hover:bg-blue-700 transition-colors disabled:bg-blue-300 disabled:cursor-not-allowed"
-                >
-                  Assign Task
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
@@ -491,7 +502,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   };
   
   const menuItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: '📊' },
     { name: 'My Tasks', path: '/tasks', icon: '✅', notificationCount: pendingApprovalCount > 0 },
     { name: 'Course Management', path: '/course-management', icon: '📋' },
     { name: 'Course Assignment', path: '/course-assignment', icon: '🎓' },
@@ -514,7 +524,12 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       <div className={`bg-white shadow-sm transform transition-all duration-300 fixed md:static inset-y-0 left-0 z-30 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0 md:w-20'} md:flex flex-col w-64 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
           <div className="flex items-center">
-            <span className="text-2xl font-bold text-blue-600">{isSidebarOpen ? 'EduPlatform' : 'E'}</span>
+            <span 
+              onClick={() => navigate('/dashboard')} 
+              className="text-2xl font-bold text-blue-600 cursor-pointer hover:text-blue-700 transition-colors"
+            >
+              {isSidebarOpen ? 'EduPlatform' : 'E'}
+            </span>
           </div>
           <button 
             onClick={toggleSidebar}
@@ -596,14 +611,25 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         {/* Top header */}
         <header className="bg-white shadow-sm z-10">
           <div className="h-16 px-4 flex items-center justify-between">
-        <button
-              onClick={() => setIsMobileMenuOpen(true)}
-              className="text-gray-500 hover:text-gray-700 focus:outline-none md:hidden"
-        >
-              <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-        </button>
+            <div className="flex items-center">
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="text-gray-500 hover:text-gray-700 focus:outline-none md:hidden mr-4"
+              >
+                <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+              <span 
+                onClick={() => {
+                  navigate('/dashboard');
+                  setIsMobileMenuOpen(false);
+                }} 
+                className="text-2xl font-bold text-blue-600 cursor-pointer hover:text-blue-700 transition-colors md:hidden"
+              >
+                EduPlatform
+              </span>
+            </div>
             <div className="flex-1 flex justify-end items-center">
               <span className="hidden md:inline text-sm text-gray-500 mr-4">
                 Welcome, {user?.firstName}
