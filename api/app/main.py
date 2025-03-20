@@ -1,14 +1,16 @@
 from fastapi import FastAPI
 from app import models
-from app.database import engine
+from app.database import engine, init_db
 from sqlalchemy_schemadisplay import create_schema_graph
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.src.routers import router as api_router
 from app.src.auth.routes import router as auth_router
 
-# Create the database tables
-models.Base.metadata.create_all(bind=engine)
+# Create the database tables and init data
+
+init_db()
+
 graph = create_schema_graph(
     metadata=models.Base.metadata,
     engine=engine,
