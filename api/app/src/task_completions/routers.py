@@ -1,4 +1,5 @@
 from typing import Annotated
+from app.annotations import ID_PATH_ANNOTATION, Status
 from app.database import get_sql
 from app.src.task_completions.controllers import (
     create_task_completion,
@@ -7,7 +8,10 @@ from app.src.task_completions.controllers import (
     update_task_completion,
     delete_task_completion,
 )
-from app.src.task_completions.schemas import TaskCompletionCreate, TaskCompletionResponse
+from app.src.task_completions.schemas import (
+    TaskCompletionCreate,
+    TaskCompletionResponse,
+)
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -16,12 +20,14 @@ router = APIRouter(prefix="/task_completion", tags=["TaskCompletion"])
 
 @router.get("", summary="Get all task_completions", operation_id="getTaskCompletions")
 def endp_get_task_completions(
-    sql: Annotated[Session, Depends(get_sql)],
+    sql: Annotated[Session, Depends(get_sql)], status: str = Status
 ) -> list[TaskCompletionResponse]:
-    return get_task_completions(sql=sql)
+    return get_task_completions(sql=sql, status=status)
 
 
-@router.post("", summary="Create a task_completion", operation_id="createTaskCompletion")
+@router.post(
+    "", summary="Create a task_completion", operation_id="createTaskCompletion"
+)
 def endp_create_task_completion(
     sql: Annotated[Session, Depends(get_sql)], data: TaskCompletionCreate
 ) -> TaskCompletionResponse:
@@ -34,7 +40,7 @@ def endp_create_task_completion(
     operation_id="updateTaskCompletion",
 )
 def endp_update_task_completion(
-    task_completion_id: int,
+    task_completion_id: ID_PATH_ANNOTATION,
     sql: Annotated[Session, Depends(get_sql)],
     data: TaskCompletionCreate,
 ) -> TaskCompletionResponse:
@@ -49,7 +55,7 @@ def endp_update_task_completion(
     operation_id="getTaskCompletion",
 )
 def endp_get_task_completion(
-    sql: Annotated[Session, Depends(get_sql)], task_completion_id: int
+    sql: Annotated[Session, Depends(get_sql)], task_completion_id: ID_PATH_ANNOTATION
 ) -> TaskCompletionResponse:
     return get_task_completion(sql=sql, task_completion_id=task_completion_id)
 
@@ -61,6 +67,6 @@ def endp_get_task_completion(
     status_code=204,
 )
 def endp_delete_task_completion(
-    task_completion_id: int, sql: Annotated[Session, Depends(get_sql)]
+    task_completion_id: ID_PATH_ANNOTATION, sql: Annotated[Session, Depends(get_sql)]
 ) -> None:
     return delete_task_completion(sql=sql, task_completion_id=task_completion_id)

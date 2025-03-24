@@ -1,8 +1,7 @@
 # Checkpoints
 
 ## 1. Technický blok vysvětlování: FastAPI, Poetry
-- Simple Helloworld API call  
-- Dependency injection  
+- Simple Helloworld API call   
 - OpenAPI JSON, SwaggerUI  
 - **Poznámka**: [Needed - .vscode extensions]  
 
@@ -14,6 +13,7 @@
 
 ## 3. Databáze a vysvětlení
 - Vysvětlení pomocí Use-case diagramu + ERD diagramu  
+- Dependency injection nad DB
 - SQLAlchemy s Pydantic  
 - Modely DB  
 - Vytvoření všech schémat Pydantic  

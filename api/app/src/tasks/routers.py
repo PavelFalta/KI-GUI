@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from app.annotations import ID_PATH_ANNOTATION
+from app.annotations import ID_PATH_ANNOTATION, Status
 from app.src.tasks.controllers import (
     create_task,
     delete_task,
@@ -18,14 +18,15 @@ router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
 @router.get("", summary="Get all tasks", operation_id="getTasks")
 def endp_get_tasks(
-    sql: Annotated[Session, Depends(get_sql)],
+    sql: Annotated[Session, Depends(get_sql)], status: str = Status
 ) -> list[TaskResponse]:
-    return get_tasks(sql=sql)
+    return get_tasks(sql=sql, status=status)
 
 
 @router.post("", summary="Create a task", operation_id="createTasks")
 def endp_create_task(
-    sql: Annotated[Session, Depends(get_sql)], data: TaskCreate,
+    sql: Annotated[Session, Depends(get_sql)],
+    data: TaskCreate,
 ) -> TaskResponse:
     return create_task(sql=sql, data=data)
 
@@ -50,6 +51,7 @@ def endp_get_task(
     "/{task_id}", summary="Delete a task", operation_id="deleteTask", status_code=204
 )
 def endp_delete_task(
-    task_id: ID_PATH_ANNOTATION, sql: Annotated[Session, Depends(get_sql)],
+    task_id: ID_PATH_ANNOTATION,
+    sql: Annotated[Session, Depends(get_sql)],
 ) -> None:
     return delete_task(sql=sql, task_id=task_id)

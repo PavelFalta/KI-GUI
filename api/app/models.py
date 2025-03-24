@@ -8,7 +8,7 @@ Base = declarative_base()
 class Role(Base):
     __tablename__ = "roles"
 
-    id = Column(Integer, primary_key=True)
+    role_id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False, unique=True)
     description = Column(String, nullable=True)
 
@@ -18,13 +18,13 @@ class Role(Base):
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, nullable=False)
+    user_id = Column(Integer, primary_key=True, nullable=False)
     username = Column(String, nullable=False, unique=True)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     password_hash = Column(String, nullable=False)
     email = Column(String, nullable=False, unique=True)
-    role_id = Column(Integer, ForeignKey("roles.id"), nullable=False)
+    role_id = Column(Integer, ForeignKey("roles.role_id"), nullable=False)
     is_active = Column(Boolean, nullable=False, default=True)
 
     role = relationship("Role", back_populates="users")
@@ -40,9 +40,9 @@ class User(Base):
 class Course(Base):
     __tablename__ = "courses"
 
-    id = Column(Integer, primary_key=True, nullable=False)
-    teacher_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
+    course_id = Column(Integer, primary_key=True, nullable=False)
+    teacher_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
+    category_id = Column(Integer, ForeignKey("categories.category_id"), nullable=False)
     title = Column(String, nullable=False, unique=True)
     description = Column(String, nullable=True)
     deadline_in_days = Column(Integer, nullable=True)
@@ -57,8 +57,8 @@ class Course(Base):
 class Task(Base):
     __tablename__ = "tasks"
 
-    id = Column(Integer, primary_key=True, nullable=False)
-    course_id = Column(Integer, ForeignKey("courses.id"), nullable=False)
+    task_id = Column(Integer, primary_key=True, nullable=False)
+    course_id = Column(Integer, ForeignKey("courses.course_id"), nullable=False)
     title = Column(String, nullable=False)
     description = Column(String, nullable=True)
     is_active = Column(Boolean, nullable=False, default=True)
@@ -70,10 +70,10 @@ class Task(Base):
 class Enrollment(Base):
     __tablename__ = "enrollments"
 
-    id = Column(Integer, primary_key=True, nullable=False)
-    student_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    assigner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    course_id = Column(Integer, ForeignKey("courses.id"), nullable=False)
+    enrollment_id = Column(Integer, primary_key=True, nullable=False)
+    student_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
+    assigner_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
+    course_id = Column(Integer, ForeignKey("courses.course_id"), nullable=False)
     completed_at = Column(DateTime, nullable=True)
     enrolled_at = Column(Date, nullable=False)
     deadline = Column(Date, nullable=True)
@@ -92,11 +92,11 @@ class Enrollment(Base):
 class TaskCompletion(Base):
     __tablename__ = "task_completions"
 
-    id = Column(Integer, primary_key=True, nullable=False)
+    task_completion_id = Column(Integer, primary_key=True, nullable=False)
     enrollment_id = Column(
-        Integer, ForeignKey("enrollments.id"), nullable=False
+        Integer, ForeignKey("enrollments.enrollment_id"), nullable=False
     )
-    task_id = Column(Integer, ForeignKey("tasks.id"), nullable=False)
+    task_id = Column(Integer, ForeignKey("tasks.task_id"), nullable=False)
     completed_at = Column(DateTime, nullable=True)
     is_active = Column(Boolean, nullable=False, default=True)
 
@@ -107,7 +107,7 @@ class TaskCompletion(Base):
 class Category(Base):
     __tablename__ = "categories"
 
-    id = Column(Integer, primary_key=True, nullable=False)
+    category_id = Column(Integer, primary_key=True, nullable=False)
     name = Column(String, nullable=False, unique=True)
     description = Column(String, nullable=True)
     is_active = Column(Boolean, nullable=False, default=True)

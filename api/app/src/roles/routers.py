@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from app.annotations import ID_PATH_ANNOTATION
+from app.annotations import ID_PATH_ANNOTATION, Status
 from app.src.roles.controllers import (
     create_role,
     delete_role,
@@ -20,9 +20,9 @@ router = APIRouter(prefix="/roles", tags=["Roles"])
 
 @router.get("", summary="Get all roles", operation_id="getRoles")
 def endp_get_roles(
-    sql: Annotated[Session, Depends(get_sql)],
+    sql: Annotated[Session, Depends(get_sql)], status: str = Status
 ) -> list[RoleResponse]:
-    return get_roles(sql=sql)
+    return get_roles(sql=sql, status=status)
 
 
 @router.post("", summary="Create a role", operation_id="createRoles")
@@ -48,7 +48,9 @@ def endp_get_role(
     return get_role(sql=sql, role_id=role_id)
 
 
-@router.delete("/{role_id}", summary="Delete a role", operation_id="deleteRole", status_code=204)
+@router.delete(
+    "/{role_id}", summary="Delete a role", operation_id="deleteRole", status_code=204
+)
 def endp_delete_role(
     role_id: ID_PATH_ANNOTATION, sql: Annotated[Session, Depends(get_sql)]
 ) -> None:

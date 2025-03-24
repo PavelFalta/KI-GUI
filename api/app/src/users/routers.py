@@ -1,11 +1,22 @@
 from typing import Annotated
-from app.annotations import ID_PATH_ANNOTATION
+from app.annotations import ID_PATH_ANNOTATION, Status
 from app.database import get_sql
-from app.src.users.controllers import create_user, get_user, get_user_tasks_and_courses, get_users, update_user
+from app.src.users.controllers import (
+    create_user,
+    get_user,
+    get_user_tasks_and_courses,
+    get_users,
+    update_user,
+)
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.src.users.schemas import UserCreate, UserResponse, UserResponseTasksAndCourses, UserUpdate
+from app.src.users.schemas import (
+    UserCreate,
+    UserResponse,
+    UserResponseTasksAndCourses,
+    UserUpdate,
+)
 
 
 router = APIRouter(prefix="/users", tags=["Users"])
@@ -13,9 +24,9 @@ router = APIRouter(prefix="/users", tags=["Users"])
 
 @router.get("", summary="Get all users", operation_id="getUsers")
 def endp_get_users(
-    sql: Annotated[Session, Depends(get_sql)],
+    sql: Annotated[Session, Depends(get_sql)], status: str = Status
 ) -> list[UserResponse]:
-    return get_users(sql)
+    return get_users(sql=sql, status=status)
 
 
 @router.post("", summary="Create a user", operation_id="createUsers")
@@ -41,7 +52,11 @@ def endp_get_user(
     return get_user(sql, user_id)
 
 
-@router.get("/{user_id}/tasksAndCourses", summary="Get a user", operation_id="getUserTasksAndCourses")
+@router.get(
+    "/{user_id}/tasksAndCourses",
+    summary="Get a user",
+    operation_id="getUserTasksAndCourses",
+)
 def endp_get_user_task_and_courses(
     sql: Annotated[Session, Depends(get_sql)], user_id: ID_PATH_ANNOTATION
 ) -> UserResponseTasksAndCourses:

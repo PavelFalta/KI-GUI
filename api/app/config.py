@@ -2,6 +2,12 @@ from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+class AuthSettings(BaseModel):
+    secret_key: str
+    algorithm: str
+    access_token_expire_minutes: int
+
+
 class SqlSettings(BaseModel):
     name: str
 
@@ -11,6 +17,7 @@ class SqlSettings(BaseModel):
 
 class Settings(BaseSettings):
     sql: SqlSettings
+    auth: AuthSettings
 
     model_config = SettingsConfigDict(
         env_file="../.env",

@@ -19,7 +19,7 @@ class UserCreate(UserBase):
 
 
 class UserResponse(UserBase):
-    id: int
+    user_id: int
 
     role: RoleResponse
 
@@ -33,7 +33,7 @@ class UserUpdate(BaseModel):
     email: EmailStr | None = Field(None, min_length=5, max_length=50)
     role_id: int | None = None
     is_active: bool | None = None
-    password: str | None = Field(None, min_length=6, max_length=50)
+    password_hash: str = Field(..., min_length=6, max_length=50)
 
 
 class UserResponseTasksAndCourses(UserResponse):

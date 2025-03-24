@@ -2,6 +2,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime, date
 # from ..courses.schemas import CourseResponse
 # from ..users.schemas import UserResponse
+from ..task_completions.schemas import TaskCompletionResponse
 
 
 class EnrollmentBase(BaseModel):
@@ -19,8 +20,8 @@ class EnrollmentCreate(EnrollmentBase):
 
 
 class EnrollmentResponse(EnrollmentBase):
-    id: int
-    
+    enrollment_id: int
+
     # student: UserResponse | None = None
     # course: CourseResponse | None = None
     # assigner: UserResponse | None = None
@@ -36,3 +37,10 @@ class EnrollmentUpdate(BaseModel):
     deadline: date | None = None
     is_active: bool | None = None
 
+
+class EnrollmentResponseTasks(EnrollmentResponse):
+    task_completions: list[TaskCompletionResponse] = []
+    completed_tasks: int = 0
+    total_tasks: int = 0
+
+    model_config = ConfigDict(from_attributes=True)

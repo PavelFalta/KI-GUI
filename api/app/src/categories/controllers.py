@@ -3,11 +3,20 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from app import models
+from sqlalchemy.orm.query import Query
 
 
-def get_categories(sql: Session) -> list[CategoryResponse]:
+def get_categories(sql: Session, status: str) -> list[CategoryResponse]:
     try:
-        categories: list[models.Category] = sql.query(models.Category).all()
+        categories: Query[models.Category] = sql.query(models.Category)
+        if status == "active":
+            categories = categories.filter(models.Category.is_active == True)
+
+        elif status == "inactive":
+            categories = categories.filter(models.Category.is_active == False)
+
+        categories = categories.all()
+
         return [CategoryResponse.model_validate(category) for category in categories]
 
     except Exception as e:
