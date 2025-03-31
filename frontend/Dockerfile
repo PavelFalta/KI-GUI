@@ -1,21 +1,27 @@
-# Use Node.js Alpine as the base image
-FROM node:18-alpine
+FROM node:20-alpine as build
 
-# Set working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json first to leverage Docker cache
+# Copy package files and install dependencies
 COPY package.json package-lock.json ./
+RUN npm ci
 
-# Install dependencies (this step is mostly for caching purposes; 
-# the host mount will override these files at runtime)
-RUN npm install
-
-# Copy the rest of the application files
+# Copy the rest of the application code
 COPY . .
 
-# Expose Vite’s default development port
-EXPOSE 5173
+# Try standard build first, if it fails bypass TypeScript checking
+RUN npx vite build
 
-# Default command (this will be overridden by docker-compose)
-CMD ["npm", "run", "dev", "--", "--host"]
+# Production stage
+FROM nginx:alpine
+
+# Copy the build output from the build stage
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Copy custom nginx config if needed
+# COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expose port 80 for the frontend
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"] 

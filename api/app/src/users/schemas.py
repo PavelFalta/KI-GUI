@@ -1,31 +1,25 @@
-from app.src.completion.schemas import CompletionResponse
-
+from app.src.task_completions.schemas import TaskCompletionResponse
 from app.src.courses.schemas import CourseResponse
 from app.src.roles.schemas import RoleResponse
-
-from app.src.students_courses.schemas import StudentCourseResponse
-from pydantic import BaseModel, ConfigDict, Field
+from app.src.enrollments.schemas import EnrollmentResponse
+from pydantic import BaseModel, ConfigDict, Field, EmailStr
 
 
 class UserBase(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
     first_name: str = Field(..., min_length=1, max_length=50)
     last_name: str = Field(..., min_length=1, max_length=50)
-    email: str = Field(..., min_length=5, max_length=50)
-
-    contact_number: str | None = Field(None, min_length=9, max_length=15)
-
+    email: EmailStr = Field(..., min_length=5, max_length=50)
     is_active: bool = True
 
 
 class UserCreate(UserBase):
     role_id: int
-
-    password: str = Field(..., min_length=6, max_length=50)
+    password_hash: str = Field(..., min_length=6, max_length=50)
 
 
 class UserResponse(UserBase):
-    id: int
+    user_id: int
 
     role: RoleResponse
 
@@ -36,19 +30,16 @@ class UserUpdate(BaseModel):
     username: str | None = Field(None, min_length=3, max_length=50)
     first_name: str | None = Field(None, min_length=1, max_length=50)
     last_name: str | None = Field(None, min_length=1, max_length=50)
-    email: str | None = Field(None, min_length=5, max_length=50)
-
-    contact_number: str | None = Field(None, min_length=9, max_length=15)
-
+    email: EmailStr | None = Field(None, min_length=5, max_length=50)
     role_id: int | None = None
     is_active: bool | None = None
-    password: str | None = Field(None, min_length=6, max_length=50)
+    password_hash: str = Field(..., min_length=6, max_length=50)
 
 
 class UserResponseTasksAndCourses(UserResponse):
     created_courses: list[CourseResponse] = []
-    enrolled_courses: list[StudentCourseResponse] = []
-    assigned_courses: list[StudentCourseResponse] = []
-    task_completions: list[CompletionResponse] = []
+    enrolled_courses: list[EnrollmentResponse] = []
+    assigned_courses: list[EnrollmentResponse] = []
+    task_completions: list[TaskCompletionResponse] = []
 
     model_config = ConfigDict(from_attributes=True)
