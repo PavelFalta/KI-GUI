@@ -1,4 +1,3 @@
-import React from 'react';
 import TaskItem from './TaskItem';
 import { TaskResponse, CourseResponse } from '../../api/models';
 

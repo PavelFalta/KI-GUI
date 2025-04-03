@@ -1,4 +1,3 @@
-import React from 'react';
 import { TaskResponse, CourseResponse } from '../../api/models';
 
 interface TaskItemProps {

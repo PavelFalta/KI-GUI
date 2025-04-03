@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useCourses } from '../../hooks/useCourses';
 import { useTasks } from '../../hooks/useTasks';
 import { useCategories } from '../../hooks/useCategories';
