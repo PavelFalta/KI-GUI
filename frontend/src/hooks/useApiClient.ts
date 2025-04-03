@@ -12,12 +12,10 @@ import {
 } from '../api/apis';
 import { useMemo } from 'react';
 
-// Hook to get authenticated API clients
+// A more efficient API client hook that only creates the APIs that are actually needed
 export const useApiClient = () => {
   const { token } = useAuth();
   
-  // Create configuration based on auth state and memoize API clients
-  // to prevent recreation on every render
   return useMemo(() => {
     const config = token ? createAuthConfig(token) : createBaseConfig();
     
@@ -31,5 +29,5 @@ export const useApiClient = () => {
       tasks: new TasksApi(config),
       users: new UsersApi(config),
     };
-  }, [token]); // Only recreate when the token changes
+  }, [token]);
 }; 

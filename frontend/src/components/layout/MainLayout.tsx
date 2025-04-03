@@ -1,59 +1,65 @@
 import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { useTaskCompletions } from '../../hooks/useTaskCompletions';
+import { useLocation, useNavigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../../context';
+import { useAppData } from '../../hooks';
 
-interface MainLayoutProps {
-  children: React.ReactNode;
+// Menu item type
+interface MenuItem {
+  name: string;
+  path: string;
+  icon: string;
+  showNotification?: boolean;
 }
 
-const MainLayout = ({ children }: MainLayoutProps) => {
+// Menu configuration
+const createMenuItems = (pendingCount: number): MenuItem[] => [
+  { name: 'My Tasks', path: '/tasks', icon: '✅', showNotification: pendingCount > 0 },
+  { name: 'Course Management', path: '/course-management', icon: '📋' },
+  { name: 'Course Assignment', path: '/course-assignment', icon: '🎓' }
+];
+
+const MainLayout = () => {
   const { user, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Get pending approval count for notification badge
-  const { getPendingApprovalsByAssigner } = useTaskCompletions();
-  const pendingApprovals = getPendingApprovalsByAssigner();
-  const pendingApprovalCount = pendingApprovals ? pendingApprovals.length : 0;
+  // Get pending count using unified data hook
+  const { getTasksToReview } = useAppData();
+  const pendingReviews = getTasksToReview();
+  const pendingCount = pendingReviews.length;
   
+  // Create menu items with notification state
+  const menuItems = createMenuItems(pendingCount);
+
+  // Navigation helpers
   const handleNavigation = (path: string) => {
     navigate(path);
     setIsMobileMenuOpen(false);
   };
-  
-  const menuItems = [
-    { name: 'My Tasks', path: '/tasks', icon: '✅', notificationCount: pendingApprovalCount > 0 },
-    { name: 'Course Management', path: '/course-management', icon: '📋' },
-    { name: 'Course Assignment', path: '/course-assignment', icon: '🎓' }
-  ];
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!isSidebarOpen);
-  };
-  
   // Get user role name safely
-  const getUserRoleName = (): string => {
+  const getUserRoleName = () => {
     if (!user) return 'User';
-    
-    if (user.role && typeof user.role === 'object' && 'name' in user.role) {
-      return user.role.name || 'User';
-    }
-    
-    return 'User';
+    return user.role && typeof user.role === 'object' && 'name' in user.role 
+      ? user.role.name || 'User' 
+      : 'User';
   };
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
-      <div className={`bg-white shadow-sm transform transition-all duration-300 fixed md:static inset-y-0 left-0 z-30 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0 md:w-20'} md:flex flex-col w-64 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+      <div className={`bg-white shadow-sm transform transition-all duration-300 fixed md:static inset-y-0 left-0 z-30 
+        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0 md:w-20'} md:flex flex-col w-64 
+        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+        
+        {/* Header */}
         <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
           <div className="flex items-center">
             <span 
@@ -64,7 +70,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             </span>
           </div>
           <button 
-            onClick={toggleSidebar}
+            onClick={() => setSidebarOpen(!isSidebarOpen)}
             className="text-gray-500 hover:text-gray-700 focus:outline-none hidden md:block"
           >
             {isSidebarOpen ? (
@@ -78,6 +84,8 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             )}
           </button>
         </div>
+
+        {/* Navigation Menu */}
         <nav className="flex-1 overflow-y-auto pt-4">
           <ul className="px-2 space-y-1">
             {menuItems.map((item) => (
@@ -94,14 +102,14 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                   {isSidebarOpen && (
                     <>
                       <span>{item.name}</span>
-                      {item.notificationCount && (
+                      {item.showNotification && (
                         <span className="absolute right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                           !
                         </span>
                       )}
                     </>
                   )}
-                  {!isSidebarOpen && item.notificationCount && (
+                  {!isSidebarOpen && item.showNotification && (
                     <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-3 h-3" />
                   )}
                 </button>
@@ -109,6 +117,8 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             ))}
           </ul>
         </nav>
+
+        {/* User Profile & Logout */}
         <div className="p-4 border-t border-gray-200">
           {user && (
             <div className="flex items-center pb-4">
@@ -159,7 +169,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       <div className="flex-1 flex flex-col overflow-hidden">
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
           <div className="container mx-auto max-w-7xl">
-            {children}
+            <Outlet />
           </div>
         </main>
       </div>

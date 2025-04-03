@@ -1,22 +1,27 @@
 import { Configuration } from './api/runtime';
 
-// Base API URL - change this based on your environment
-export const BASE_PATH = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-
-// Default configuration without authentication
-export const createBaseConfig = (): Configuration => {
-  return new Configuration({
-    basePath: BASE_PATH,
-  });
+// API configuration
+export const API_CONFIG = {
+  basePath: import.meta.env.VITE_API_URL || 'http://localhost:8000',
 };
 
-// Configuration with auth token
-export const createAuthConfig = (token: string): Configuration => {
-  // Format the token as a bearer token if it doesn't already have the prefix
-  const formattedToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+// Create configuration with optional auth token
+export const createConfig = (token?: string | null): Configuration => {
+  const options: {
+    basePath: string;
+    accessToken?: string;
+  } = {
+    basePath: API_CONFIG.basePath,
+  };
   
-  return new Configuration({
-    basePath: BASE_PATH,
-    accessToken: formattedToken,
-  });
-}; 
+  // Add token if provided
+  if (token) {
+    options.accessToken = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+  }
+  
+  return new Configuration(options);
+};
+
+// Legacy exports for backward compatibility
+export const createBaseConfig = (): Configuration => createConfig();
+export const createAuthConfig = (token: string): Configuration => createConfig(token); 

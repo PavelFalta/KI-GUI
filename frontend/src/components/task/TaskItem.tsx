@@ -11,52 +11,18 @@ interface TaskItemProps {
   onComplete?: () => Promise<void>;
 }
 
-const StatusBadge = ({ status }: { status: string }) => {
-  let bgColor = 'bg-gray-100';
-  let textColor = 'text-gray-600';
-  
-  switch (status) {
-    case 'notStarted':
-      bgColor = 'bg-gray-100';
-      textColor = 'text-gray-600';
-      break;
-    case 'pending':
-      bgColor = 'bg-yellow-100';
-      textColor = 'text-yellow-700';
-      break;
-    case 'completed':
-      bgColor = 'bg-green-100';
-      textColor = 'text-green-700';
-      break;
-    default:
-      break;
-  }
-  
-  const statusText = {
-    notStarted: 'Not Started',
-    pending: 'Pending Approval',
-    completed: 'Completed'
-  }[status] || status;
-  
-  return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${bgColor} ${textColor}`}>
-      {statusText}
-    </span>
-  );
+// Status display configuration
+const STATUS_CONFIG = {
+  notStarted: { text: 'Not Started', classes: 'bg-gray-100 text-gray-600' },
+  pending: { text: 'Pending Approval', classes: 'bg-yellow-100 text-yellow-700' },
+  completed: { text: 'Completed', classes: 'bg-green-100 text-green-700' }
 };
 
-const TaskItem = ({
-  task,
-  course,
-  status,
-  assignerId,
-  assignerName,
-  onRequestApproval,
-  onApprove,
-  onComplete
-}: TaskItemProps) => {
-  // Determine which action button to show based on status
-  const renderActionButton = () => {
+const TaskItem = ({ task, course, status, assignerName, onApprove, onComplete }: TaskItemProps) => {
+  const statusInfo = STATUS_CONFIG[status] || STATUS_CONFIG.notStarted;
+  
+  // Action button based on task status
+  const ActionButton = () => {
     if (status === 'notStarted' && onComplete) {
       return (
         <button
@@ -89,19 +55,19 @@ const TaskItem = ({
           <h3 className="text-lg font-semibold text-gray-800">{task.title}</h3>
           <div className="flex items-center mt-1 space-x-2">
             <span className="text-sm text-gray-500">Course: {course.title}</span>
-            <StatusBadge status={status} />
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusInfo.classes}`}>
+              {statusInfo.text}
+            </span>
           </div>
           {assignerName && (
-            <div className="text-xs text-gray-500 mt-1">
-              Assigned by: {assignerName}
-            </div>
+            <div className="text-xs text-gray-500 mt-1">Assigned by: {assignerName}</div>
           )}
           {task.description && (
             <div className="text-sm text-gray-600 mt-2">{task.description}</div>
           )}
         </div>
         <div className="flex">
-          {renderActionButton()}
+          <ActionButton />
         </div>
       </div>
     </div>
