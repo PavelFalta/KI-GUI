@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { useCourses } from '../hooks/useCourses';
-import { useStudents } from '../hooks/useStudents';
-import { useEnrollments } from '../hooks/useEnrollments';
-import { useAuth } from '../context/AuthContext';
-import { CourseResponse, EnrollmentCreate } from '../api/models';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
+import { useCourses } from '../../hooks/useCourses';
+import { useStudents } from '../../hooks/useStudents';
+import { useEnrollments } from '../../hooks/useEnrollments';
+import { useAuth } from '../../context/AuthContext';
+import { CourseResponse, EnrollmentCreate } from '../../api/models';
+import LoadingSpinner from '../../components/ui/LoadingSpinner';
 import { useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
-const CourseAssignment: React.FC = () => {
+const CourseAssignmentPage = () => {
   const location = useLocation();
   const { courses, loading: loadingCourses } = useCourses();
   const { students, loading: loadingStudents } = useStudents();
@@ -157,7 +157,14 @@ const CourseAssignment: React.FC = () => {
 
   return (
     <div className="animate-fade-in">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Course Assignment</h1>
+      <motion.h1 
+        className="text-3xl font-bold text-gray-900 mb-6"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        Course Assignment
+      </motion.h1>
       <p className="text-lg text-gray-700 mb-6">Assign courses to students</p>
       
       {error && (
@@ -188,37 +195,38 @@ const CourseAssignment: React.FC = () => {
                 className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Search for a student..."
               />
-              {showStudentResults && studentSearchQuery && (
+              {showStudentResults && (
                 <div className="absolute max-h-60 w-full mt-1 bg-white rounded-lg shadow-lg overflow-auto z-10">
-                  {filteredStudents.map(student => (
-                    <div
-                      key={student.userId}
-                      className={`p-3 hover:bg-gray-50 cursor-pointer ${
-                        selectedStudent === student.userId ? 'bg-blue-50' : ''
-                      }`}
-                      onClick={() => {
-                        setSelectedStudent(student.userId);
-                        setStudentSearchQuery(`${student.firstName} ${student.lastName}`);
-                        setShowStudentResults(false);
-                        courseSearchRef.current?.focus();
-                      }}
-                    >
-                      <div className="flex items-center">
-                        <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-800 font-semibold">
-                          {student.firstName[0]}{student.lastName[0]}
-                        </div>
-                        <div className="ml-3">
-                          <div className="font-medium text-gray-900">{student.firstName} {student.lastName}</div>
-                          <div className="text-sm text-gray-500">@{student.username}</div>
-                        </div>
+                  {filteredStudents.length > 0 ? (
+                    filteredStudents.map(student => (
+                      <div
+                        key={student.userId}
+                        className={`p-3 hover:bg-gray-50 cursor-pointer ${
+                          selectedStudent === student.userId ? 'bg-blue-50' : ''
+                        }`}
+                        onClick={() => {
+                          setSelectedStudent(student.userId);
+                          setStudentSearchQuery(`${student.firstName} ${student.lastName}`);
+                          setShowStudentResults(false);
+                        }}
+                      >
+                        <div className="font-medium">{student.firstName} {student.lastName}</div>
+                        <div className="text-sm text-gray-500">{student.email}</div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <div className="p-3 text-gray-500">No students found</div>
+                  )}
                 </div>
               )}
             </div>
+            {selectedStudent && (
+              <div className="mt-2 text-sm text-gray-600">
+                Selected: {getStudentNameById(selectedStudent)}
+              </div>
+            )}
           </div>
-
+          
           {/* Course Search */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Select Course</label>
@@ -235,79 +243,107 @@ const CourseAssignment: React.FC = () => {
                 className="w-full border border-gray-300 rounded-lg py-2 px-3 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Search for a course..."
               />
-              {showCourseResults && courseSearchQuery && (
+              {showCourseResults && (
                 <div className="absolute max-h-60 w-full mt-1 bg-white rounded-lg shadow-lg overflow-auto z-10">
-                  {filteredCourses.map(course => (
-                    <div
-                      key={course.courseId}
-                      className={`p-3 hover:bg-gray-50 cursor-pointer ${
-                        selectedCourse === course.courseId ? 'bg-blue-50' : ''
-                      }`}
-                      onClick={() => {
-                        setSelectedCourse(course.courseId);
-                        setCourseSearchQuery(course.title);
-                        setShowCourseResults(false);
-                      }}
-                    >
-                      <div className="font-medium text-gray-900">{course.title}</div>
-                      {course.description && (
-                        <div className="text-sm text-gray-500">{course.description}</div>
-                      )}
-                    </div>
-                  ))}
+                  {filteredCourses.length > 0 ? (
+                    filteredCourses.map(course => (
+                      <div
+                        key={course.courseId}
+                        className={`p-3 hover:bg-gray-50 cursor-pointer ${
+                          selectedCourse === course.courseId ? 'bg-blue-50' : ''
+                        }`}
+                        onClick={() => {
+                          setSelectedCourse(course.courseId);
+                          setCourseSearchQuery(course.title);
+                          setShowCourseResults(false);
+                        }}
+                      >
+                        <div className="font-medium">{course.title}</div>
+                        {course.description && (
+                          <div className="text-sm text-gray-500">{course.description}</div>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="p-3 text-gray-500">No courses found</div>
+                  )}
                 </div>
               )}
             </div>
+            {selectedCourse && (
+              <div className="mt-2 text-sm text-gray-600">
+                Selected: {getCourseById(selectedCourse)?.title || 'Unknown Course'}
+              </div>
+            )}
           </div>
-
-          {/* Action Buttons */}
-          <div className="flex justify-end">
+          
+          <div className="pt-4">
             <button
               onClick={handleCreateEnrollment}
-              disabled={!selectedStudent || !selectedCourse}
+              disabled={!selectedCourse || !selectedStudent}
               className={`px-4 py-2 rounded-lg ${
-                !selectedStudent || !selectedCourse
+                !selectedCourse || !selectedStudent
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : 'bg-blue-600 text-white hover:bg-blue-700'
               }`}
             >
-              Create Assignment
+              Assign Course
             </button>
           </div>
         </div>
       </div>
 
-      {/* Existing Assignments */}
+      {/* Current Assignments */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
           <h2 className="text-xl font-semibold text-gray-800">Current Assignments</h2>
         </div>
-        <div className="divide-y divide-gray-200">
+        <div className="overflow-x-auto">
           {assignedCourses.length === 0 ? (
-            <div className="px-6 py-8 text-center text-gray-500">
-              No assignments found. Create a new assignment to get started.
+            <div className="p-6 text-center text-gray-500">
+              No courses have been assigned yet.
             </div>
           ) : (
-            assignedCourses.map(enrollment => (
-              <div key={enrollment.enrollmentId} className="px-6 py-4 hover:bg-gray-50">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-medium text-gray-900">
-                      {getCourseById(enrollment.courseId)?.title}
-                    </h3>
-                    <p className="text-sm text-gray-500">
-                      Assigned to: {getStudentNameById(enrollment.studentId)}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => handleDeleteEnrollment(enrollment.enrollmentId)}
-                    className="text-sm text-red-600 hover:text-red-800"
-                  >
-                    Remove
-                  </button>
-                </div>
-              </div>
-            ))
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Student
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Course
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {assignedCourses.map(enrollment => {
+                  const course = getCourseById(enrollment.courseId);
+                  const studentName = getStudentNameById(enrollment.studentId);
+                  
+                  return (
+                    <tr key={enrollment.enrollmentId} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="font-medium text-gray-900">{studentName}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="font-medium text-gray-900">{course ? course.title : 'Unknown Course'}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                        <button
+                          onClick={() => handleDeleteEnrollment(enrollment.enrollmentId)}
+                          className="px-3 py-1 text-sm bg-red-50 text-red-600 rounded hover:bg-red-100"
+                        >
+                          Remove
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           )}
         </div>
       </div>
@@ -315,4 +351,4 @@ const CourseAssignment: React.FC = () => {
   );
 };
 
-export default CourseAssignment; 
+export default CourseAssignmentPage; 

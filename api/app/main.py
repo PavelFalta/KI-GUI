@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app import models
-from app.database import engine
+from app.database import engine, SessionLocal
 from sqlalchemy_schemadisplay import create_schema_graph
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -9,6 +9,27 @@ from app.src.auth.routes import router as auth_router
 
 # Create the database tables
 models.Base.metadata.create_all(bind=engine)
+
+# Create a default role if none exists
+def create_default_role():
+    db = SessionLocal()
+    try:
+        # Check if any roles exist
+        existing_roles = db.query(models.Role).first()
+        if not existing_roles:
+            # Create a default role
+            default_role = models.Role(name="User", description="Default user role")
+            db.add(default_role)
+            db.commit()
+            print("Default role created")
+    except Exception as e:
+        print(f"Error creating default role: {e}")
+    finally:
+        db.close()
+
+# Create default role
+create_default_role()
+
 graph = create_schema_graph(
     metadata=models.Base.metadata,
     engine=engine,

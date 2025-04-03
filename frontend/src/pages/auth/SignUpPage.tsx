@@ -22,49 +22,33 @@ const SignUpPage = () => {
   
   const validateForm = () => {
     const errors: Record<string, string> = {};
-    let isValid = true;
     
-    if (!firstName.trim()) {
-      errors.firstName = 'First name is required';
-      isValid = false;
+    if (firstName.trim().length < 2) {
+      errors.firstName = 'First name must be at least 2 characters';
     }
     
-    if (!lastName.trim()) {
-      errors.lastName = 'Last name is required';
-      isValid = false;
+    if (lastName.trim().length < 2) {
+      errors.lastName = 'Last name must be at least 2 characters';
     }
     
-    if (!email.trim()) {
-      errors.email = 'Email is required';
-      isValid = false;
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      errors.email = 'Email is invalid';
-      isValid = false;
+    if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+      errors.email = 'Please enter a valid email address';
     }
     
-    if (!username.trim()) {
-      errors.username = 'Username is required';
-      isValid = false;
-    } else if (username.length < 3) {
+    if (username.trim().length < 3) {
       errors.username = 'Username must be at least 3 characters';
-      isValid = false;
     }
     
-    if (!password) {
-      errors.password = 'Password is required';
-      isValid = false;
-    } else if (password.length < 6) {
-      errors.password = 'Password must be at least 6 characters';
-      isValid = false;
+    if (password.trim().length < 3) {
+      errors.password = 'Password must be at least 3 characters';
     }
     
     if (password !== confirmPassword) {
       errors.confirmPassword = 'Passwords do not match';
-      isValid = false;
     }
     
     setFormErrors(errors);
-    return isValid;
+    return Object.keys(errors).length === 0;
   };
   
   const handleSubmit = async (e: React.FormEvent) => {
@@ -97,8 +81,8 @@ const SignUpPage = () => {
       // After successful signup, log the user in
       await login(username, password);
       
-      // Redirect to home or profile page
-      navigate('/profile');
+      // Redirect to dashboard
+      navigate('/dashboard');
     } catch (err: any) {
       console.error('Error during signup:', err);
       let errorMsg = 'Failed to create account. Please try again.';
@@ -123,8 +107,20 @@ const SignUpPage = () => {
     }
   };
   
+  // Check if form is valid for enabling/disabling submit button
+  const isFormValid = () => {
+    return (
+      firstName.trim().length >= 2 &&
+      lastName.trim().length >= 2 &&
+      email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) &&
+      username.trim().length >= 3 &&
+      password.trim().length >= 3 &&
+      password === confirmPassword
+    );
+  };
+  
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full bg-white rounded-xl shadow-md p-8">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-900">Create an Account</h2>
@@ -251,8 +247,12 @@ const SignUpPage = () => {
           <div>
             <button
               type="submit"
-              disabled={isLoading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors duration-200"
+              disabled={isLoading || !isFormValid()}
+              className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
+                isLoading || !isFormValid() 
+                  ? 'bg-gray-300 cursor-not-allowed' 
+                  : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+              } transition-colors duration-200`}
             >
               {isLoading ? (
                 <div className="flex items-center">

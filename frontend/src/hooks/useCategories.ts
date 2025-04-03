@@ -40,23 +40,27 @@ export const useCategories = (): UseCategoriesResult => {
 
   // Create a new category
   const createCategory = useCallback(async (categoryData: CategoryCreate): Promise<CategoryResponse> => {
-    setLoading(true);
-    setError(null);
-    
     try {
+      // Create the category first without setting loading state
       const newCategory = await apiClient.categories.createCategories({
         categoryCreate: categoryData
       });
       
-      // Update the categories list
-      setCategories(prevCategories => [...prevCategories, newCategory]);
+      // Add the new category to the local state immediately
+      setCategories(prevCategories => {
+        // Add the new category if it doesn't already exist
+        if (!prevCategories.some(c => c.categoryId === newCategory.categoryId)) {
+          return [...prevCategories, newCategory];
+        }
+        return prevCategories;
+      });
+      
+      // Return the category immediately without fetching all categories
       return newCategory;
     } catch (err) {
       console.error('Error creating category:', err);
       setError('Failed to create category. Please try again.');
       throw err;
-    } finally {
-      setLoading(false);
     }
   }, [apiClient.categories]);
 
